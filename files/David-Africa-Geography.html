@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Africa Geography Adventure!</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060e06; --green:#52b788; --lime:#7bed9f; --amber:#ffc107;
+    --fire:#ff6b35; --bone:#e8d5b0; --red:#f72585; --sky:#90e0ef;
+    --purple:#c77dff; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse at 15% 20%,rgba(255,193,7,.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(82,183,136,.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#060e06 0%,#020802 100%);}
+  .floaters{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .floaters span{position:absolute;opacity:.055;animation:floatUp linear infinite;}
+  @keyframes floatUp{0%{transform:translateY(105vh) rotate(0deg);opacity:0}5%{opacity:.055}95%{opacity:.055}100%{transform:translateY(-5vh) rotate(25deg);opacity:0}}
+
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:16px 14px 70px;}
+
+  .hdr{text-align:center;margin-bottom:20px;animation:dropIn .6s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes dropIn{from{transform:translateY(-44px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .hdr-badge{display:inline-block;background:rgba(255,193,7,.1);border:1.5px solid rgba(255,193,7,.3);border-radius:50px;padding:5px 16px;font-size:.78rem;font-weight:800;color:var(--amber);letter-spacing:.5px;margin-bottom:8px;}
+  .hdr h1{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,6vw,2.9rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800,0 0 30px rgba(255,193,7,.2);}
+  .hdr p{color:rgba(255,255,255,.4);font-weight:700;font-size:.88rem;margin-top:5px;}
+
+  .tabs{display:flex;gap:10px;margin-bottom:20px;animation:dropIn .5s .08s cubic-bezier(.34,1.56,.64,1) both;}
+  .tab{flex:1;padding:11px 6px;background:var(--card);border:2px solid var(--border);border-radius:16px;font-family:'Boogaloo',cursive;font-size:.92rem;color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;text-align:center;}
+  .tab.active{background:rgba(255,193,7,.12);border-color:var(--amber);color:var(--amber);box-shadow:0 0 16px rgba(255,193,7,.15);}
+  .tab:hover:not(.active){background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);}
+
+  .ch-dots{display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .cdot{width:36px;height:36px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:all .25s;}
+  .cdot.active{background:rgba(255,193,7,.2);border-color:var(--amber);transform:scale(1.2);box-shadow:0 0 12px rgba(255,193,7,.3);}
+  .cdot.done{background:rgba(123,237,159,.15);border-color:var(--lime);}
+
+  .ch-card{border-radius:26px;padding:28px 22px 22px;background:var(--card);border:2px solid rgba(255,193,7,.2);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  @keyframes cardIn{from{transform:scale(.9) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .ch-num{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(255,193,7,.55);margin-bottom:8px;}
+  .ch-title{font-family:'Boogaloo',cursive;font-size:clamp(1.35rem,4.5vw,2rem);color:var(--amber);margin-bottom:4px;text-shadow:1px 1px 0 #5a3800;}
+  .ch-emoji{font-size:3.5rem;display:block;text-align:center;margin:14px 0;animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+
+  .story{font-size:.95rem;color:rgba(255,255,255,.85);line-height:1.8;font-weight:600;margin-bottom:16px;}
+  .story strong{color:var(--amber);font-weight:900;}
+  .story em{color:var(--bone);font-style:normal;font-weight:800;}
+
+  .facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .fbox{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 12px;}
+  .fbox .fi{font-size:1.8rem;display:block;margin-bottom:6px;}
+  .fbox .ft{font-family:'Boogaloo',cursive;font-size:.95rem;color:var(--amber);margin-bottom:4px;}
+  .fbox .fd{font-size:.78rem;color:rgba(255,255,255,.65);font-weight:700;line-height:1.5;}
+
+  .wow{background:rgba(255,107,53,.08);border:1.5px dashed rgba(255,107,53,.3);border-radius:14px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+  .wow .wi{font-size:1.4rem;flex-shrink:0;}
+  .wow .wt{font-size:.82rem;color:#ffb08a;font-weight:700;line-height:1.55;}
+  .wow .wt strong{color:var(--fire);}
+
+  .rank-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  .rank-table th{background:rgba(255,193,7,.12);color:var(--amber);font-family:'Boogaloo',cursive;font-size:.82rem;padding:10px 8px;text-align:left;border-bottom:1.5px solid rgba(255,193,7,.2);}
+  .rank-table td{font-size:.76rem;color:rgba(255,255,255,.8);font-weight:700;padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.06);line-height:1.4;}
+  .rank-table tr:hover td{background:rgba(255,255,255,.03);}
+
+  .mirror{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin:16px 0;align-items:center;}
+  .mirror .mside{display:flex;flex-direction:column;gap:8px;}
+  .mirror .mzone{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;font-size:.72rem;font-weight:800;text-align:center;color:rgba(255,255,255,.75);}
+  .mirror .mline{writing-mode:vertical-rl;text-align:center;font-family:'Boogaloo',cursive;color:var(--sky);font-size:.85rem;letter-spacing:1px;}
+
+  .ch-nav{display:flex;gap:10px;margin-top:4px;}
+  .ch-btn{flex:1;padding:13px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.05rem;cursor:pointer;transition:all .2s;}
+  .ch-prev{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:2px solid var(--border);}
+  .ch-prev:hover{background:rgba(255,255,255,.12);color:white;}
+  .ch-next{background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .ch-next:hover{transform:translateY(-2px);}
+  .ch-quiz{background:linear-gradient(135deg,var(--lime),var(--green));color:#060e06;box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .ch-quiz:hover{transform:translateY(-2px);}
+
+  #quizPhase{display:none;}
+  .q-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .qhb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:10px 6px;text-align:center;}
+  .qhb .qhv{font-family:'Boogaloo',cursive;font-size:1.35rem;color:white;display:block;}
+  .qhb .qhl{font-size:.62rem;color:rgba(255,255,255,.35);font-weight:800;text-transform:uppercase;}
+
+  .prog-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:8px;margin-bottom:18px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px rgba(123,237,159,.4);}
+
+  .q-card{border-radius:26px;padding:26px 22px 22px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  .q-top{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .q-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:1.5px solid;}
+  .q-type-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:800;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);}
+  .q-emoji-big{font-size:3rem;display:block;text-align:center;margin-bottom:10px;animation:sway 3s ease-in-out infinite;}
+  .q-text{font-family:'Boogaloo',cursive;font-size:clamp(1.05rem,3.5vw,1.4rem);color:white;text-align:center;line-height:1.35;margin-bottom:8px;white-space:pre-line;}
+  .q-sub{font-size:.8rem;color:rgba(255,255,255,.4);text-align:center;font-weight:700;margin-bottom:14px;line-height:1.5;font-style:italic;}
+
+  .hint-box{background:rgba(255,193,7,.07);border:1.5px dashed rgba(255,193,7,.25);border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:.8rem;color:rgba(255,193,7,.7);font-weight:700;text-align:center;cursor:pointer;transition:all .2s;}
+  .hint-box:hover{background:rgba(255,193,7,.12);}
+  .hint-box.shown{cursor:default;color:var(--amber);border-style:solid;}
+
+  .opts-4{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .opts-6{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .opt{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:14px;padding:13px 8px;cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;color:white;text-align:center;line-height:1.3;}
+  .opt:hover:not(:disabled){background:rgba(82,183,136,.12);border-color:rgba(82,183,136,.4);transform:scale(1.03);}
+  .opt.correct{background:rgba(123,237,159,.22)!important;border-color:var(--lime)!important;animation:pop .35s cubic-bezier(.34,1.56,.64,1);}
+  .opt.wrong{background:rgba(247,37,133,.15)!important;border-color:var(--red)!important;animation:shk .3s ease;}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .type-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .type-input{width:100%;max-width:400px;padding:14px 18px;background:rgba(255,255,255,.07);border:2.5px solid rgba(255,255,255,.18);border-radius:16px;font-family:'Boogaloo',cursive;font-size:1.4rem;color:white;text-align:center;outline:none;transition:all .2s;caret-color:var(--amber);}
+  .type-input::placeholder{color:rgba(255,255,255,.22);font-size:1rem;}
+  .type-input:focus{border-color:rgba(255,193,7,.6);box-shadow:0 0 20px rgba(255,193,7,.15);}
+  .type-input.ok-in{border-color:var(--lime);background:rgba(123,237,159,.08);}
+  .type-input.err-in{border-color:var(--red);background:rgba(247,37,133,.07);}
+  .submit-btn{padding:13px 34px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .submit-btn:hover{transform:translateY(-2px);}
+  .submit-btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  .fb{border-radius:13px;padding:13px 16px;margin-top:13px;font-weight:700;font-size:.88rem;line-height:1.55;animation:fadeUp .3s ease both;display:none;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .fb.ok{background:rgba(123,237,159,.1);border:1.5px solid var(--lime);color:#b7f5c8;}
+  .fb.err{background:rgba(247,37,133,.08);border:1.5px solid var(--red);color:#ffaacc;}
+
+  .next-btn{display:none;width:100%;margin-top:12px;padding:14px;border:none;border-radius:50px;cursor:pointer;transition:all .2s;font-family:'Boogaloo',cursive;font-size:1.15rem;color:#060e06;background:linear-gradient(135deg,var(--amber),var(--fire));box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .next-btn:hover{transform:translateY(-2px);}
+
+  #resultsSection{display:none;text-align:center;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  .r-trophy{font-size:5.5rem;display:block;margin-bottom:12px;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .r-title{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800;margin-bottom:6px;}
+  .r-sub{color:rgba(255,255,255,.5);font-weight:700;font-size:.95rem;margin-bottom:18px;}
+  .r-stars{font-size:2rem;letter-spacing:6px;margin-bottom:18px;}
+  .facts-learned{background:var(--card);border:1.5px solid rgba(255,193,7,.2);border-radius:18px;padding:16px;margin-bottom:16px;text-align:left;}
+  .facts-learned h3{font-family:'Boogaloo',cursive;color:var(--amber);font-size:1rem;margin-bottom:12px;}
+  .fl-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:700;line-height:1.45;}
+  .ml-box{background:rgba(255,255,255,.03);border:1.5px solid rgba(144,224,239,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.83rem;text-align:left;}
+  .ml-box p{margin-bottom:5px;line-height:1.55;}
+  .ml-box .en{color:var(--amber);font-weight:800;}
+  .ml-box .ro{color:var(--lime);font-weight:800;}
+  .ml-box .es{color:var(--sky);font-weight:800;}
+  .r-btns{display:flex;gap:10px;}
+  .r-btn{flex:1;padding:14px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;color:#060e06;}
+  .r-btn-learn{background:rgba(255,255,255,.08);color:white;border:2px solid var(--border);}
+  .r-btn-learn:hover{background:rgba(255,255,255,.13);}
+  .r-btn-quiz{background:linear-gradient(135deg,var(--lime),var(--green));box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .r-btn-quiz:hover{transform:scale(1.03);}
+
+  .cp{position:fixed;width:9px;height:9px;top:-9px;border-radius:2px;animation:cf linear forwards;z-index:999;pointer-events:none;}
+  @keyframes cf{to{transform:translateY(106vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="floaters" id="floaters"></div>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-badge">🌍 AFRICA GEOGRAPHY — LEARN + QUIZ</div>
+    <h1>Africa — Land of Records! 🦁</h1>
+    <p>Read all 6 chapters → then take the big quiz! 📖➡️🧠</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabLearn" onclick="goLearn()">📖 Learn</button>
+    <button class="tab"        id="tabQuiz"  onclick="goQuiz()">⚡ Quiz Me!</button>
+  </div>
+
+  <div id="learnPhase">
+    <div class="ch-dots" id="chDots"></div>
+    <div id="chArea"></div>
+  </div>
+
+  <div id="quizPhase">
+    <div class="q-hud">
+      <div class="qhb"><span class="qhv" id="qhScore">0</span><span class="qhl">⭐ Score</span></div>
+      <div class="qhb"><span class="qhv" id="qhStreak">0🔥</span><span class="qhl">Streak</span></div>
+      <div class="qhb"><span class="qhv" id="qhNum">1/20</span><span class="qhl">Question</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="q-card" id="qCard">
+      <div class="q-top">
+        <span class="q-tag" id="qTag" style="color:var(--amber);border-color:var(--amber)55;background:var(--amber)12">🌍 Africa</span>
+        <span class="q-type-pill" id="qTypePill">CHOOSE</span>
+      </div>
+      <span class="q-emoji-big" id="qEmoji">🌍</span>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="q-sub"  id="qSub"></div>
+      <div class="hint-box" id="hintBox" onclick="showHint()">💡 Tap for a hint</div>
+      <div id="answerArea"></div>
+      <div class="fb" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">Next ➡️</button>
+    </div>
+  </div>
+
+  <div id="resultsSection">
+    <span class="r-trophy" id="rTrophy">🏆</span>
+    <div class="r-title" id="rTitle">Amazing, David!</div>
+    <div class="r-sub"   id="rSub"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="facts-learned">
+      <h3>🌍 Everything you learned today:</h3>
+      <div id="flList"></div>
+    </div>
+    <div class="ml-box" id="rMl"></div>
+    <div class="r-btns">
+      <button class="r-btn r-btn-learn" onclick="goLearn()">📖 Review Lesson</button>
+      <button class="r-btn r-btn-quiz"  onclick="goQuiz()">🔄 Try Quiz Again!</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const chapters = [
+  {
+    emoji:'🌍', title:'Africa in Numbers',
+    content:`
+      <p class="story">Africa is a <strong>GIANT</strong> continent — the second largest in the world, both in
+      size and in population! It's home to <strong>54 countries</strong> and over <strong>1.5 billion people</strong>.
+      <em>In Romanian: Africa. In Spanish: África!</em></p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">📏</span><div class="ft">Huge Size</div><div class="fd">About 30 million km² — that's big enough to fit the USA, China, India AND most of Europe inside it, all at once!</div></div>
+        <div class="fbox"><span class="fi">🏳️</span><div class="ft">54 Countries</div><div class="fd">Africa has more countries than any other continent — from tiny Seychelles to giant Algeria!</div></div>
+        <div class="fbox"><span class="fi">👥</span><div class="ft">1.5+ Billion People</div><div class="fd">Nearly 1 in every 5 people on Earth lives in Africa — and it's the fastest-growing continent!</div></div>
+        <div class="fbox"><span class="fi">📍</span><div class="ft">A Special Spot</div><div class="fd">Africa is the ONLY continent crossed by both the Equator AND the Prime Meridian (0°)!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">Africa is so big that you could fit the <strong>USA, China, India, and most of Western Europe</strong> inside it — all at the same time — and still have room left over!</div></div>`,
+    facts:['Africa is the 2nd largest continent by both size and population','Africa has 54 countries — more than any other continent','Africa is home to over 1.5 billion people','Africa is the only continent crossed by both the Equator and the Prime Meridian']
+  },
+  {
+    emoji:'👥', title:'Who Lives Where? Countries & Cities',
+    content:`
+      <p class="story">Africa's population is growing faster than any continent on Earth! Here are the biggest
+      countries and cities you should know:</p>
+      <table class="rank-table">
+        <tr><th>#</th><th>Country</th><th>Population</th></tr>
+        <tr><td>🥇</td><td>🇳🇬 Nigeria</td><td>~242 million</td></tr>
+        <tr><td>🥈</td><td>🇪🇹 Ethiopia</td><td>~139 million</td></tr>
+        <tr><td>🥉</td><td>🇪🇬 Egypt</td><td>~120 million</td></tr>
+        <tr><td>4</td><td>🇨🇩 DR Congo</td><td>~116 million</td></tr>
+        <tr><td>5</td><td>🇹🇿 Tanzania</td><td>~73 million</td></tr>
+      </table>
+      <table class="rank-table">
+        <tr><th>#</th><th>City</th><th>Population</th></tr>
+        <tr><td>🥇</td><td>Cairo, Egypt</td><td>~23 million</td></tr>
+        <tr><td>🥈</td><td>Lagos, Nigeria</td><td>~22 million</td></tr>
+        <tr><td>🥉</td><td>Kinshasa, DR Congo</td><td>~17 million</td></tr>
+        <tr><td>4</td><td>Johannesburg, S. Africa</td><td>~15 million</td></tr>
+        <tr><td>5</td><td>Luanda, Angola</td><td>~10 million</td></tr>
+      </table>
+      <div class="wow"><span class="wi">📈</span><div class="wt"><strong>Nigeria</strong> alone is home to about 1 in every 6 Africans! It's also one of the most linguistically diverse countries on Earth, with several hundred different languages spoken.</div></div>`,
+    facts:['Nigeria is Africa\'s most populated country with about 242 million people','Cairo, Egypt is Africa\'s biggest city with about 23 million people','Ethiopia, Egypt, DR Congo and Tanzania complete the top 5 countries','Nigeria alone has several hundred different languages spoken']
+  },
+  {
+    emoji:'🌊', title:'Mighty Rivers',
+    content:`
+      <p class="story">Africa's rivers are true giants — including the <strong>longest river on the entire
+      planet!</strong></p>
+      <table class="rank-table">
+        <tr><th>#</th><th>River</th><th>Length</th></tr>
+        <tr><td>🥇</td><td>🌊 Nile</td><td>6,650 km</td></tr>
+        <tr><td>🥈</td><td>🌊 Congo</td><td>4,700 km</td></tr>
+        <tr><td>🥉</td><td>🌊 Niger</td><td>4,180 km</td></tr>
+        <tr><td>4</td><td>🌊 Zambezi</td><td>2,740 km</td></tr>
+        <tr><td>5</td><td>🌊 Orange</td><td>2,200 km</td></tr>
+      </table>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">👑</span><div class="ft">World Champion</div><div class="fd">The Nile is the LONGEST river in the entire world! It flows through 11 different countries.</div></div>
+        <div class="fbox"><span class="fi">🕳️</span><div class="ft">Deepest River</div><div class="fd">The Congo River is the deepest river on Earth — over 220 metres deep in some spots!</div></div>
+        <div class="fbox"><span class="fi">💦</span><div class="ft">Victoria Falls</div><div class="fd">The Zambezi River plunges over Victoria Falls — one of the largest waterfalls on Earth, on the border of Zambia and Zimbabwe!</div></div>
+        <div class="fbox"><span class="fi">🐊</span><div class="ft">Life-Givers</div><div class="fd">Ancient Egyptian civilisation grew entirely along the Nile — without it, the desert would have no life at all!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">The <strong>Nile</strong> is so long that if you could walk along it at a normal walking speed non-stop, it would take you almost <strong>two months</strong> to reach the end!</div></div>`,
+    facts:['The Nile (6,650 km) is the longest river in the WORLD','The Congo River is the deepest river on Earth — over 220m deep!','The Niger, Zambezi and Orange rivers complete Africa\'s top 5','Victoria Falls on the Zambezi River is one of the largest waterfalls on Earth']
+  },
+  {
+    emoji:'⛰️', title:'Towering Mountains',
+    content:`
+      <p class="story">Africa's tallest peaks are true giants — including one with a very surprising secret at
+      the top!</p>
+      <table class="rank-table">
+        <tr><th>#</th><th>Mountain</th><th>Height</th></tr>
+        <tr><td>🥇</td><td>⛰️ Kilimanjaro</td><td>5,895 m</td></tr>
+        <tr><td>🥈</td><td>⛰️ Mount Kenya</td><td>5,199 m</td></tr>
+        <tr><td>🥉</td><td>⛰️ Margherita Peak</td><td>5,109 m</td></tr>
+        <tr><td>4</td><td>⛰️ Mount Meru</td><td>4,562 m</td></tr>
+        <tr><td>5</td><td>⛰️ Ras Dashen</td><td>4,550 m</td></tr>
+      </table>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🏔️</span><div class="ft">Africa's Roof</div><div class="fd">Kilimanjaro, in Tanzania, is Africa's highest point — and the tallest FREE-STANDING mountain in the world (it's not part of a mountain range)!</div></div>
+        <div class="fbox"><span class="fi">🧊</span><div class="ft">Snow Near the Equator!</div><div class="fd">Even though Kilimanjaro is very close to the hot Equator, its peak is covered in snow and ice — because it's so incredibly tall and cold up there!</div></div>
+        <div class="fbox"><span class="fi">🇰🇪</span><div class="ft">Mount Kenya</div><div class="fd">Africa's 2nd tallest peak gave its name to the whole country of Kenya!</div></div>
+        <div class="fbox"><span class="fi">🌋</span><div class="ft">Sleeping Volcano</div><div class="fd">Kilimanjaro is actually a volcano — dormant, meaning it's "sleeping" and hasn't erupted in a very long time.</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">Climbers can start their trek up Kilimanjaro through <strong>steamy tropical rainforest</strong> and finish at the top walking on <strong>snow and glaciers</strong> — all on ONE mountain!</div></div>`,
+    facts:['Mount Kilimanjaro (5,895m) is Africa\'s tallest mountain and a dormant volcano','Kilimanjaro has snow and ice at its peak despite being near the hot Equator','Mount Kenya, Africa\'s 2nd tallest peak, gave Kenya its name','Kilimanjaro is the tallest free-standing mountain in the world']
+  },
+  {
+    emoji:'☀️', title:'Amazing Climate Zones',
+    content:`
+      <p class="story">Here's something incredible — Africa is almost perfectly cut in half by the
+      <strong>Equator</strong>, and its climate zones mirror each other like a reflection, going north AND south!</p>
+      <div class="mirror">
+        <div class="mside">
+          <div class="mzone">🏜️ Mediterranean (Morocco)</div>
+          <div class="mzone">🏝️ Desert (Sahara)</div>
+          <div class="mzone">🦒 Savanna</div>
+        </div>
+        <div class="mline">← EQUATOR →</div>
+        <div class="mside">
+          <div class="mzone">🌴 Savanna</div>
+          <div class="mzone">🏝️ Desert (Kalahari)</div>
+          <div class="mzone">🏜️ Mediterranean (S. Africa)</div>
+        </div>
+      </div>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🌴</span><div class="ft">Rainforest</div><div class="fd">Right on the Equator: hot, wet, and full of thick jungle — home to gorillas and thousands of species!</div></div>
+        <div class="fbox"><span class="fi">🦒</span><div class="ft">Savanna</div><div class="fd">Grassy plains with scattered trees — home to lions, giraffes, elephants and zebras!</div></div>
+        <div class="fbox"><span class="fi">🏜️</span><div class="ft">Desert</div><div class="fd">The Sahara (north) and Kalahari (south) — hot, dry, and covered in sand and rock.</div></div>
+        <div class="fbox"><span class="fi">☀️</span><div class="ft">Mediterranean</div><div class="fd">At the very top and bottom tips of Africa — mild, sunny weather, like Morocco and Cape Town!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🪞</span><div class="wt">Because the Equator runs almost through Africa's middle, the climate zones repeat like a <strong>mirror image</strong> — rainforest in the centre, then savanna, then desert, then mild coastal climate at both ends!</div></div>`,
+    facts:['The Equator almost perfectly splits Africa in half','Climate zones mirror each other north and south of the Equator','Zones go: rainforest → savanna → desert → Mediterranean climate','The savanna is home to lions, giraffes, elephants and zebras']
+  },
+  {
+    emoji:'🏆', title:'Incredible Records',
+    content:`
+      <p class="story">Let's finish with some of Africa's most amazing world records!</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🏜️</span><div class="ft">Biggest Hot Desert</div><div class="fd">The Sahara covers 9.2 million km² — roughly the size of the whole United States! It's the largest HOT desert on Earth.</div></div>
+        <div class="fbox"><span class="fi">💧</span><div class="ft">Biggest Lake</div><div class="fd">Lake Victoria is Africa's largest lake — and the world's 2nd biggest FRESHWATER lake, shared by Kenya, Uganda and Tanzania!</div></div>
+        <div class="fbox"><span class="fi">🦎</span><div class="ft">Magical Madagascar</div><div class="fd">The 4th largest island in the world! Over 90% of its wildlife — like lemurs — exists NOWHERE else on Earth!</div></div>
+        <div class="fbox"><span class="fi">📍</span><div class="ft">Only Continent Like It</div><div class="fd">Africa is the only continent crossed by both the Equator (0° latitude) AND the Prime Meridian (0° longitude)!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🌍</span><div class="wt">In Romanian, Africa is <strong>Africa</strong> 🇷🇴 — in Spanish, it's <strong>África</strong> 🇪🇸! Wherever you say it, this continent is full of record-breakers — the longest river, the biggest hot desert, and some of the most unique animals on the planet!</div></div>
+      <p class="story">Now you know Africa's population giants, its mighty rivers, towering mountains, mirrored
+      climate zones, and its incredible records. You're a true Africa geography expert! 🌍🏆</p>`,
+    facts:['The Sahara (9.2 million km²) is the largest hot desert on Earth','Lake Victoria is Africa\'s biggest lake and the world\'s 2nd largest freshwater lake','Madagascar is the 4th largest island — over 90% of its wildlife exists nowhere else','Africa is the only continent crossed by both the Equator and the Prime Meridian']
+  }
+];
+
+const questions = [
+  { cat:'👥 Population', type:'pick4', e:'🇳🇬', col:'#ffc107',
+    q:'Which country is Africa\'s most populated?',
+    sub:'It has over 240 million people!',
+    hint:'It\'s in West Africa, and its biggest city is Lagos…',
+    opts:['Egypt','Nigeria!','South Africa','Kenya'], c:1,
+    ok:'🥇 NIGERIA! With about 242 million people, it\'s by far Africa\'s most populated country!',
+    err:'NIGERIA is Africa\'s most populated country, with about 242 million people!' },
+
+  { cat:'👥 Population', type:'type', e:'👥', col:'#ffc107',
+    q:'About how many MILLION people live in Nigeria?',
+    sub:'A very big number — think close to a quarter of a billion!',
+    hint:'It starts with 24…',
+    accept:['242','240','239','241','243','245'],
+    ok:'🎯 About 242 million! That\'s more people than the UK, France and Germany combined!',
+    err:'About 242 million people live in Nigeria — an enormous population!' },
+
+  { cat:'👥 Population', type:'pick4', e:'🇪🇹', col:'#ffc107',
+    q:'Which country is Africa\'s 2nd most populated?',
+    sub:'It\'s in East Africa',
+    hint:'Its capital is Addis Ababa…',
+    opts:['Ethiopia!','Egypt','DR Congo','Tanzania'], c:0,
+    ok:'🥈 ETHIOPIA! With about 139 million people, it comes right after Nigeria!',
+    err:'ETHIOPIA is 2nd, with about 139 million people!' },
+
+  { cat:'🏙️ Cities', type:'pick4', e:'🏙️', col:'#ff6b35',
+    q:'Which is Africa\'s biggest city?',
+    sub:'It\'s famous for its pyramids nearby!',
+    hint:'It\'s the capital of Egypt…',
+    opts:['Lagos','Cairo!','Kinshasa','Johannesburg'], c:1,
+    ok:'🏙️ CAIRO! With about 23 million people, it\'s Africa\'s largest city!',
+    err:'CAIRO, Egypt is Africa\'s biggest city with about 23 million people!' },
+
+  { cat:'🏙️ Cities', type:'type', e:'🇪🇬', col:'#ff6b35',
+    q:'Cairo is the capital of which country?',
+    sub:'Home to the famous pyramids of Giza',
+    hint:'It\'s in North Africa, along the Nile…',
+    accept:['egypt'],
+    ok:'🇪🇬 EGYPT! Cairo sits right along the mighty Nile River!',
+    err:'EGYPT! Cairo is Egypt\'s capital, sitting beside the Nile River!' },
+
+  { cat:'🌊 Rivers', type:'type', e:'🌊', col:'#90e0ef',
+    q:'What is the LONGEST river not just in Africa, but in the WHOLE WORLD?',
+    sub:'It flows through 11 countries!',
+    hint:'Ancient Egypt grew up along this river…',
+    accept:['nile','the nile'],
+    ok:'🌊 The NILE! At 6,650 km, it\'s the longest river on planet Earth!',
+    err:'The NILE — the longest river in the entire WORLD, at 6,650 km!' },
+
+  { cat:'🌊 Rivers', type:'pick4', e:'📏', col:'#90e0ef',
+    q:'About how long is the Nile River?',
+    sub:'A truly enormous distance',
+    hint:'Think somewhere around 6-7 thousand km…',
+    opts:['1,000 km','6,650 km!','20,000 km','500 km'], c:1,
+    ok:'📏 6,650 km! That\'s roughly the distance from London to Beijing!',
+    err:'About 6,650 km — one of the longest distances on Earth!' },
+
+  { cat:'🌊 Rivers', type:'pick4', e:'🕳️', col:'#90e0ef',
+    q:'Which African river is the DEEPEST river in the world?',
+    sub:'Over 220 metres deep in places!',
+    hint:'It flows through the huge Congo rainforest…',
+    opts:['Nile','Niger','Congo!','Zambezi'], c:2,
+    ok:'🕳️ The CONGO! It plunges over 220 metres deep in places — the deepest river on Earth!',
+    err:'The CONGO River is the world\'s deepest river — over 220 metres in places!' },
+
+  { cat:'🌊 Rivers', type:'type', e:'💦', col:'#90e0ef',
+    q:'Which river has the famous Victoria Falls?',
+    sub:'It\'s on the border of Zambia and Zimbabwe',
+    hint:'It\'s Africa\'s 4th longest river…',
+    accept:['zambezi','the zambezi'],
+    ok:'💦 The ZAMBEZI! Victoria Falls is one of the largest waterfalls on the whole planet!',
+    err:'The ZAMBEZI River — home to the spectacular Victoria Falls!' },
+
+  { cat:'⛰️ Mountains', type:'type', e:'⛰️', col:'#7bed9f',
+    q:'What is the tallest mountain in Africa?',
+    sub:'It has snow at the top, even near the Equator!',
+    hint:'It\'s in Tanzania…',
+    accept:['kilimanjaro','mount kilimanjaro'],
+    ok:'⛰️ Mount KILIMANJARO! At 5,895m, it\'s Africa\'s highest point!',
+    err:'Mount KILIMANJARO — Africa\'s tallest mountain at 5,895 metres!' },
+
+  { cat:'⛰️ Mountains', type:'pick4', e:'📏', col:'#7bed9f',
+    q:'Approximately how tall is Mount Kilimanjaro?',
+    sub:'One of the tallest mountains in the world',
+    hint:'Think somewhere just under 6,000 metres…',
+    opts:['1,000 m','5,895 m!','10,000 m','3,000 m'], c:1,
+    ok:'📏 5,895 metres! Tall enough to have permanent snow and ice at the summit!',
+    err:'About 5,895 metres — tall enough for snow, even near the hot Equator!' },
+
+  { cat:'⛰️ Mountains', type:'pick4', e:'🧊', col:'#7bed9f',
+    q:'What\'s surprising about Kilimanjaro\'s peak, even though it\'s near the hot Equator?',
+    sub:'You wouldn\'t expect to find this so close to the tropics!',
+    hint:'Think about very cold, white weather…',
+    opts:['It\'s always raining','It has snow and ice!','It\'s underwater','Nothing grows there at all'], c:1,
+    ok:'🧊 It has SNOW AND ICE at the top! Because it\'s so tall, the peak stays freezing cold all year!',
+    err:'It has snow and ice at the summit, even though it\'s so close to the hot Equator!' },
+
+  { cat:'⛰️ Mountains', type:'pick4', e:'🇹🇿', col:'#7bed9f',
+    q:'Which country is Mount Kilimanjaro in?',
+    sub:'The same country as Mount Meru and Dar es Salaam',
+    hint:'Not Kenya — its neighbour to the south…',
+    opts:['Kenya','Tanzania!','Uganda','Ethiopia'], c:1,
+    ok:'🇹🇿 TANZANIA! Kilimanjaro is Tanzania\'s most famous landmark!',
+    err:'TANZANIA! Mount Kilimanjaro is located in Tanzania, East Africa!' },
+
+  { cat:'☀️ Climate', type:'pick4', e:'📍', col:'#c77dff',
+    q:'Which imaginary line cuts Africa almost exactly in half?',
+    sub:'It also passes through Brazil and Indonesia',
+    hint:'It circles the middle of the whole Earth…',
+    opts:['The Arctic Circle','The Equator!','The Tropic of Cancer only','The International Date Line'], c:1,
+    ok:'📍 The EQUATOR! It runs almost right through the middle of Africa!',
+    err:'The EQUATOR cuts Africa almost perfectly in half!' },
+
+  { cat:'☀️ Climate', type:'pick6', e:'🦒', col:'#c77dff',
+    q:'Going from the Equator toward the north OR south, which climate zone comes right after the rainforest?',
+    sub:'Home to lions, giraffes and zebras',
+    hint:'Think grassy plains with scattered trees…',
+    opts:['Desert','Savanna!','Tundra','Mediterranean','Ice cap','Ocean'], c:1,
+    ok:'🦒 SAVANNA! Grassy plains full of amazing animals come right after the rainforest zone!',
+    err:'SAVANNA — the grassy plains zone that comes after the rainforest, home to lions and giraffes!' },
+
+  { cat:'☀️ Climate', type:'type', e:'🌴', col:'#c77dff',
+    q:'What is the name of the huge grassy plain climate zone where lions, giraffes and zebras live?',
+    sub:'It comes after the rainforest zone',
+    hint:'Starts with "sav"…',
+    accept:['savanna','savannah'],
+    ok:'🌴 SAVANNA! Grassy plains with scattered trees, full of Africa\'s most famous animals!',
+    err:'SAVANNA — the grassy plains where lions, giraffes, elephants and zebras roam!' },
+
+  { cat:'🏆 Records', type:'type', e:'🏜️', col:'#ffc107',
+    q:'What is the name of the largest HOT desert in the world, located in Africa?',
+    sub:'It covers about the same area as the whole USA!',
+    hint:'It\'s in North Africa…',
+    accept:['sahara','the sahara'],
+    ok:'🏜️ The SAHARA! At 9.2 million km², it\'s the largest hot desert on Earth!',
+    err:'The SAHARA — the largest hot desert in the world, covering North Africa!' },
+
+  { cat:'🏆 Records', type:'pick4', e:'💧', col:'#ffc107',
+    q:'Which is the largest lake in Africa?',
+    sub:'Shared by Kenya, Uganda and Tanzania',
+    hint:'Named after a British queen…',
+    opts:['Lake Victoria!','Lake Chad','Lake Malawi','Lake Nasser'], c:0,
+    ok:'💧 Lake VICTORIA! It\'s Africa\'s biggest lake and the world\'s 2nd biggest freshwater lake!',
+    err:'Lake VICTORIA — Africa\'s largest lake, shared by three countries!' },
+
+  { cat:'🏆 Records', type:'pick4', e:'🦎', col:'#ffc107',
+    q:'Madagascar is famous for being home to which unique animals, found nowhere else on Earth?',
+    sub:'They have big round eyes and long tails!',
+    hint:'They love to leap between trees…',
+    opts:['Penguins','Lemurs!','Polar bears','Kangaroos'], c:1,
+    ok:'🦎 LEMURS! Over 90% of Madagascar\'s wildlife exists nowhere else on the whole planet!',
+    err:'LEMURS! Madagascar\'s isolation means most of its wildlife is found nowhere else on Earth!' },
+
+  { cat:'🌍 Grand Finale!', type:'type', e:'🌍', col:'#ffc107',
+    q:'Africa is the only continent crossed by BOTH the Equator and another famous imaginary line at 0° longitude. What is that line called?\nTwo words: "Prime ___"',
+    sub:'It runs through Greenwich, London',
+    hint:'Prime Mer...?',
+    accept:['prime meridian','the prime meridian','greenwich meridian'],
+    ok:'🏆 The PRIME MERIDIAN! Africa is the only continent crossed by both the Equator AND this famous 0° line!',
+    err:'The PRIME MERIDIAN (0° longitude) — Africa is the only continent crossed by both this line AND the Equator!' },
+];
+
+let chIdx=0, seenChs=new Set([0]);
+let qIdx=0, score=0, streak=0, bestStreak=0, answered=false, hintShown=false;
+
+const flEl=document.getElementById('floaters');
+const fIcons=['🌍','🦁','🦒','🐘','🌊','⛰️','🏜️','🌴','☀️','🦓','🐊','🌍','🦎','💧','🏙️','👥'];
+for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=fIcons[Math.floor(Math.random()*fIcons.length)];s.style.left=(Math.random()*100)+'%';s.style.fontSize=(.9+Math.random()*1.3)+'rem';s.style.animationDuration=(9+Math.random()*13)+'s';s.style.animationDelay=(Math.random()*10)+'s';flEl.appendChild(s);}
+
+function buildDots(){
+  const dc=document.getElementById('chDots'); dc.innerHTML='';
+  chapters.forEach((ch,i)=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(i===chIdx?' active':seenChs.has(i)?' done':'');
+    d.textContent=ch.emoji;
+    d.onclick=()=>{chIdx=i;seenChs.add(i);buildDots();renderCh();};
+    dc.appendChild(d);
+  });
+}
+
+function renderCh(){
+  const ch=chapters[chIdx];
+  const isLast=chIdx===chapters.length-1;
+  const area=document.getElementById('chArea');
+  area.innerHTML=`<div class="ch-card" id="chCard">
+    <div class="ch-num">Chapter ${chIdx+1} of ${chapters.length}</div>
+    <div class="ch-title">${ch.emoji} ${ch.title}</div>
+    ${ch.content}
+    <div class="ch-nav">
+      ${chIdx>0?`<button class="ch-btn ch-prev" onclick="moveCh(-1)">⬅️ Back</button>`:''}
+      ${!isLast
+        ?`<button class="ch-btn ch-next" onclick="moveCh(1)">Next Chapter ➡️</button>`
+        :`<button class="ch-btn ch-quiz" onclick="goQuiz()">⚡ Ready — Quiz me!</button>`}
+    </div>
+  </div>`;
+  const card=document.getElementById('chCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function moveCh(dir){
+  chIdx=Math.max(0,Math.min(chapters.length-1,chIdx+dir));
+  seenChs.add(chIdx); buildDots(); renderCh();
+}
+
+function goLearn(){
+  document.getElementById('learnPhase').style.display='block';
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.add('active');
+  document.getElementById('tabQuiz').classList.remove('active');
+}
+
+function goQuiz(){
+  document.getElementById('learnPhase').style.display='none';
+  document.getElementById('quizPhase').style.display='block';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.remove('active');
+  document.getElementById('tabQuiz').classList.add('active');
+  qIdx=0; score=0; streak=0; bestStreak=0; answered=false; hintShown=false;
+  document.getElementById('qhScore').textContent='0';
+  document.getElementById('qhStreak').textContent='0🔥';
+  renderQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQ(){
+  answered=false; hintShown=false;
+  const q=questions[qIdx];
+  document.getElementById('qhNum').textContent=`${qIdx+1}/${questions.length}`;
+  document.getElementById('progFill').style.width=((qIdx/questions.length)*100)+'%';
+  document.getElementById('qTypePill').textContent=q.type==='type'?'⌨️ TYPE IT':'🖱️ CHOOSE';
+  document.getElementById('qEmoji').textContent=q.e;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qSub').textContent=q.sub||'';
+
+  const tag=document.getElementById('qTag');
+  tag.textContent=q.cat; tag.style.color=q.col; tag.style.borderColor=q.col+'55'; tag.style.background=q.col+'12';
+
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  const hb=document.getElementById('hintBox'); hb.className='hint-box'; hb.textContent='💡 Tap for a hint';
+
+  const aa=document.getElementById('answerArea'); aa.innerHTML='';
+  if(q.type==='type'){
+    aa.innerHTML=`<div class="type-wrap">
+      <input class="type-input" id="typeIn" placeholder="Type your answer…" autocomplete="off" spellcheck="false"/>
+      <button class="submit-btn" id="subBtn" onclick="submitType()">✅ Check Answer</button>
+    </div>`;
+    const inp=document.getElementById('typeIn');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitType();});
+    setTimeout(()=>inp.focus(),100);
+  } else {
+    const grid=document.createElement('div');
+    grid.className=q.type==='pick6'?'opts-6':'opts-4';
+    q.opts.forEach((opt,i)=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt;
+      btn.onclick=()=>pickOpt(i,btn); grid.appendChild(btn);
+    });
+    aa.appendChild(grid);
+  }
+  const card=document.getElementById('qCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+}
+
+function showHint(){
+  if(hintShown||answered)return;
+  hintShown=true;
+  const hb=document.getElementById('hintBox');
+  hb.className='hint-box shown'; hb.textContent='💡 Hint: '+questions[qIdx].hint;
+}
+
+function submitType(){
+  if(answered)return;
+  const inp=document.getElementById('typeIn'), val=inp.value.trim().toLowerCase();
+  if(!val){inp.focus();return;}
+  const q=questions[qIdx];
+  const correct=q.accept.some(a=>val===a.toLowerCase());
+  inp.disabled=true; document.getElementById('subBtn').disabled=true;
+  inp.className='type-input '+(correct?'ok-in':'err-in');
+  processAns(correct,q);
+}
+
+function pickOpt(chosen,btn){
+  if(answered)return;
+  const q=questions[qIdx];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const correct=chosen===q.c;
+  if(correct) btn.classList.add('correct');
+  else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.c].classList.add('correct'); }
+  processAns(correct,q);
+}
+
+function processAns(correct,q){
+  answered=true;
+  const fb=document.getElementById('fb'); fb.style.display='block';
+  if(correct){
+    const pts=10+(streak>=2?5:0)+(!hintShown?3:0);
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak;
+    document.getElementById('qhScore').textContent=score;
+    document.getElementById('qhStreak').textContent=streak+'🔥';
+    fb.className='fb ok';
+    fb.textContent=q.ok+(streak>=3?` 🔥 ${streak} in a row!`:'')+(!hintShown?' ⭐ No-hint bonus!':'');
+  } else {
+    streak=0; document.getElementById('qhStreak').textContent='0🔥';
+    fb.className='fb err'; fb.textContent=q.err;
+  }
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=questions.length) showResults();
+  else renderQ();
+}
+
+function showResults(){
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('progFill').style.width='100%';
+
+  const rawPct = score / (questions.length * 10);
+
+  let trophy,title,sub;
+  if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — you ARE an Africa geography champion! 🌍👑`;}
+  else if(rawPct>=.8){trophy='🥇';title='Africa Expert, David!';sub=`${score} points! Outstanding knowledge of countries, rivers, mountains and more! 🔥`;}
+  else if(rawPct>=.6){trophy='🥈';title='Brilliant work, David!';sub=`${score} points! Really impressive knowledge! Go over the chapters and try again! 💪`;}
+  else if(rawPct>=.4){trophy='🌍';title='Good effort, David!';sub=`${score} points! Re-read the lesson and try again — you'll smash it! 🚀`;}
+  else               {trophy='🗺️';title='Keep going, David!';sub=`${score} points! Read every chapter carefully first, then try the quiz. You can do it! 💪`;}
+
+  document.getElementById('rTrophy').textContent=trophy;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rStars').textContent=rawPct>=1?'⭐⭐⭐⭐⭐':rawPct>=.8?'⭐⭐⭐⭐':rawPct>=.6?'⭐⭐⭐':rawPct>=.4?'⭐⭐':'⭐';
+
+  const fl2=document.getElementById('flList'); fl2.innerHTML='';
+  chapters.forEach(ch=>{
+    ch.facts.forEach(f=>{
+      const d=document.createElement('div'); d.className='fl-row';
+      d.innerHTML=`<span style="font-size:.9rem;flex-shrink:0">🌍</span><span>${f}</span>`; fl2.appendChild(d);
+    });
+  });
+
+  const ml=document.getElementById('rMl');
+  if(rawPct>=.7){
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Incredible, David! Countries, rivers, mountains, climate zones — you know Africa inside out! 🌍👑</p>
+      <p class="ro">🇷🇴 Incredibil, David! Țări, fluvii, munți, zone climatice — cunoști Africa la perfecție! 🌟</p>
+      <p class="es">🇪🇸 ¡Increíble, David! ¡Países, ríos, montañas, zonas climáticas — conoces África a la perfección! 🏆</p>`;
+  } else {
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Good effort, David! Read the chapters again carefully then retake the quiz — you'll do much better! 💪</p>
+      <p class="ro">🇷🇴 Efort bun, David! Recitește capitolele cu atenție și încearcă din nou — vei reuși! 📚</p>
+      <p class="es">🇪🇸 ¡Buen esfuerzo, David! ¡Vuelve a leer los capítulos e inténtalo de nuevo! 🔄</p>`;
+  }
+  if(rawPct>=.6) launchConfetti();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function launchConfetti(){
+  const cols=['#ffc107','#7bed9f','#ff6b35','#f72585','#90e0ef','#c77dff','#e8d5b0'];
+  for(let i=0;i<90;i++){setTimeout(()=>{const c=document.createElement('div');c.className='cp';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(1.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);},i*20);}
+}
+
+buildDots(); renderCh();
+</script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Planet Earth History!</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060e06; --green:#52b788; --lime:#7bed9f; --amber:#ffc107;
+    --fire:#ff6b35; --bone:#e8d5b0; --red:#f72585; --sky:#90e0ef;
+    --purple:#c77dff; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse at 15% 20%,rgba(82,183,136,.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(144,224,239,.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#060e06 0%,#020802 100%);}
+  .floaters{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .floaters span{position:absolute;opacity:.055;animation:floatUp linear infinite;}
+  @keyframes floatUp{0%{transform:translateY(105vh) rotate(0deg);opacity:0}5%{opacity:.055}95%{opacity:.055}100%{transform:translateY(-5vh) rotate(25deg);opacity:0}}
+
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:16px 14px 70px;}
+
+  .hdr{text-align:center;margin-bottom:20px;animation:dropIn .6s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes dropIn{from{transform:translateY(-44px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .hdr-badge{display:inline-block;background:rgba(144,224,239,.1);border:1.5px solid rgba(144,224,239,.3);border-radius:50px;padding:5px 16px;font-size:.78rem;font-weight:800;color:var(--sky);letter-spacing:.5px;margin-bottom:8px;}
+  .hdr h1{font-family:'Boogaloo',cursive;font-size:clamp(1.9rem,6vw,3rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800,0 0 30px rgba(255,193,7,.2);}
+  .hdr p{color:rgba(255,255,255,.4);font-weight:700;font-size:.88rem;margin-top:5px;}
+
+  .tabs{display:flex;gap:10px;margin-bottom:20px;animation:dropIn .5s .08s cubic-bezier(.34,1.56,.64,1) both;}
+  .tab{flex:1;padding:11px 6px;background:var(--card);border:2px solid var(--border);border-radius:16px;font-family:'Boogaloo',cursive;font-size:.92rem;color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;text-align:center;}
+  .tab.active{background:rgba(255,193,7,.12);border-color:var(--amber);color:var(--amber);box-shadow:0 0 16px rgba(255,193,7,.15);}
+  .tab:hover:not(.active){background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);}
+
+  .ch-dots{display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .cdot{width:36px;height:36px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:all .25s;}
+  .cdot.active{background:rgba(255,193,7,.2);border-color:var(--amber);transform:scale(1.2);box-shadow:0 0 12px rgba(255,193,7,.3);}
+  .cdot.done{background:rgba(123,237,159,.15);border-color:var(--lime);}
+
+  .ch-card{border-radius:26px;padding:28px 22px 22px;background:var(--card);border:2px solid rgba(144,224,239,.2);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  @keyframes cardIn{from{transform:scale(.9) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .ch-num{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(255,193,7,.55);margin-bottom:8px;}
+  .ch-title{font-family:'Boogaloo',cursive;font-size:clamp(1.4rem,4.5vw,2.05rem);color:var(--amber);margin-bottom:4px;text-shadow:1px 1px 0 #5a3800;}
+  .ch-emoji{font-size:3.5rem;display:block;text-align:center;margin:14px 0;animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+
+  .story{font-size:.95rem;color:rgba(255,255,255,.85);line-height:1.8;font-weight:600;margin-bottom:16px;}
+  .story strong{color:var(--amber);font-weight:900;}
+  .story em{color:var(--bone);font-style:normal;font-weight:800;}
+
+  .facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .fbox{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 12px;}
+  .fbox .fi{font-size:1.8rem;display:block;margin-bottom:6px;}
+  .fbox .ft{font-family:'Boogaloo',cursive;font-size:.95rem;color:var(--amber);margin-bottom:4px;}
+  .fbox .fd{font-size:.78rem;color:rgba(255,255,255,.65);font-weight:700;line-height:1.5;}
+
+  .wow{background:rgba(144,224,239,.08);border:1.5px dashed rgba(144,224,239,.35);border-radius:14px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+  .wow .wi{font-size:1.4rem;flex-shrink:0;}
+  .wow .wt{font-size:.82rem;color:#bdeeff;font-weight:700;line-height:1.55;}
+  .wow .wt strong{color:var(--sky);}
+
+  .timeline{display:flex;align-items:stretch;gap:0;margin:16px 0;overflow-x:auto;padding-bottom:4px;}
+  .tl-item{display:flex;flex-direction:column;align-items:center;min-width:100px;}
+  .tl-dot{width:38px;height:38px;border-radius:50%;border:3px solid;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;margin-bottom:8px;}
+  .tl-label{font-size:.68rem;font-weight:800;text-align:center;line-height:1.3;}
+  .tl-line{flex:1;height:3px;background:rgba(196,168,130,.2);margin-top:17px;min-width:20px;}
+
+  .ch-nav{display:flex;gap:10px;margin-top:4px;}
+  .ch-btn{flex:1;padding:13px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.05rem;cursor:pointer;transition:all .2s;}
+  .ch-prev{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:2px solid var(--border);}
+  .ch-prev:hover{background:rgba(255,255,255,.12);color:white;}
+  .ch-next{background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .ch-next:hover{transform:translateY(-2px);}
+  .ch-quiz{background:linear-gradient(135deg,var(--lime),var(--green));color:#060e06;box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .ch-quiz:hover{transform:translateY(-2px);}
+
+  #quizPhase{display:none;}
+  .q-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .qhb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:10px 6px;text-align:center;}
+  .qhb .qhv{font-family:'Boogaloo',cursive;font-size:1.35rem;color:white;display:block;}
+  .qhb .qhl{font-size:.62rem;color:rgba(255,255,255,.35);font-weight:800;text-transform:uppercase;}
+
+  .prog-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:8px;margin-bottom:18px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px rgba(123,237,159,.4);}
+
+  .q-card{border-radius:26px;padding:26px 22px 22px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  .q-top{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .q-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:1.5px solid;}
+  .q-type-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:800;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);}
+  .q-emoji-big{font-size:3rem;display:block;text-align:center;margin-bottom:10px;animation:sway 3s ease-in-out infinite;}
+  .q-text{font-family:'Boogaloo',cursive;font-size:clamp(1.05rem,3.5vw,1.4rem);color:white;text-align:center;line-height:1.35;margin-bottom:8px;white-space:pre-line;}
+  .q-sub{font-size:.8rem;color:rgba(255,255,255,.4);text-align:center;font-weight:700;margin-bottom:14px;line-height:1.5;font-style:italic;}
+
+  .hint-box{background:rgba(255,193,7,.07);border:1.5px dashed rgba(255,193,7,.25);border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:.8rem;color:rgba(255,193,7,.7);font-weight:700;text-align:center;cursor:pointer;transition:all .2s;}
+  .hint-box:hover{background:rgba(255,193,7,.12);}
+  .hint-box.shown{cursor:default;color:var(--amber);border-style:solid;}
+
+  .opts-4{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .opts-6{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .opt{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:14px;padding:13px 8px;cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;color:white;text-align:center;line-height:1.3;}
+  .opt:hover:not(:disabled){background:rgba(82,183,136,.12);border-color:rgba(82,183,136,.4);transform:scale(1.03);}
+  .opt.correct{background:rgba(123,237,159,.22)!important;border-color:var(--lime)!important;animation:pop .35s cubic-bezier(.34,1.56,.64,1);}
+  .opt.wrong{background:rgba(247,37,133,.15)!important;border-color:var(--red)!important;animation:shk .3s ease;}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .type-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .type-input{width:100%;max-width:400px;padding:14px 18px;background:rgba(255,255,255,.07);border:2.5px solid rgba(255,255,255,.18);border-radius:16px;font-family:'Boogaloo',cursive;font-size:1.4rem;color:white;text-align:center;outline:none;transition:all .2s;caret-color:var(--amber);}
+  .type-input::placeholder{color:rgba(255,255,255,.22);font-size:1rem;}
+  .type-input:focus{border-color:rgba(255,193,7,.6);box-shadow:0 0 20px rgba(255,193,7,.15);}
+  .type-input.ok-in{border-color:var(--lime);background:rgba(123,237,159,.08);}
+  .type-input.err-in{border-color:var(--red);background:rgba(247,37,133,.07);}
+  .submit-btn{padding:13px 34px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .submit-btn:hover{transform:translateY(-2px);}
+  .submit-btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  .fb{border-radius:13px;padding:13px 16px;margin-top:13px;font-weight:700;font-size:.88rem;line-height:1.55;animation:fadeUp .3s ease both;display:none;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .fb.ok{background:rgba(123,237,159,.1);border:1.5px solid var(--lime);color:#b7f5c8;}
+  .fb.err{background:rgba(247,37,133,.08);border:1.5px solid var(--red);color:#ffaacc;}
+
+  .next-btn{display:none;width:100%;margin-top:12px;padding:14px;border:none;border-radius:50px;cursor:pointer;transition:all .2s;font-family:'Boogaloo',cursive;font-size:1.15rem;color:#060e06;background:linear-gradient(135deg,var(--amber),var(--fire));box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .next-btn:hover{transform:translateY(-2px);}
+
+  #resultsSection{display:none;text-align:center;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  .r-trophy{font-size:5.5rem;display:block;margin-bottom:12px;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .r-title{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800;margin-bottom:6px;}
+  .r-sub{color:rgba(255,255,255,.5);font-weight:700;font-size:.95rem;margin-bottom:18px;}
+  .r-stars{font-size:2rem;letter-spacing:6px;margin-bottom:18px;}
+  .facts-learned{background:var(--card);border:1.5px solid rgba(144,224,239,.2);border-radius:18px;padding:16px;margin-bottom:16px;text-align:left;}
+  .facts-learned h3{font-family:'Boogaloo',cursive;color:var(--amber);font-size:1rem;margin-bottom:12px;}
+  .fl-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:700;line-height:1.45;}
+  .ml-box{background:rgba(255,255,255,.03);border:1.5px solid rgba(144,224,239,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.83rem;text-align:left;}
+  .ml-box p{margin-bottom:5px;line-height:1.55;}
+  .ml-box .en{color:var(--amber);font-weight:800;}
+  .ml-box .ro{color:var(--lime);font-weight:800;}
+  .ml-box .es{color:var(--sky);font-weight:800;}
+  .r-btns{display:flex;gap:10px;}
+  .r-btn{flex:1;padding:14px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;color:#060e06;}
+  .r-btn-learn{background:rgba(255,255,255,.08);color:white;border:2px solid var(--border);}
+  .r-btn-learn:hover{background:rgba(255,255,255,.13);}
+  .r-btn-quiz{background:linear-gradient(135deg,var(--lime),var(--green));box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .r-btn-quiz:hover{transform:scale(1.03);}
+
+  .cp{position:fixed;width:9px;height:9px;top:-9px;border-radius:2px;animation:cf linear forwards;z-index:999;pointer-events:none;}
+  @keyframes cf{to{transform:translateY(106vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="floaters" id="floaters"></div>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-badge">🌍 EARTH'S HISTORY — LEARN + QUIZ</div>
+    <h1>The Story of Planet Earth! 🌎</h1>
+    <p>Read all 6 chapters → then take the big quiz! 📖➡️🧠</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabLearn" onclick="goLearn()">📖 Learn</button>
+    <button class="tab"        id="tabQuiz"  onclick="goQuiz()">⚡ Quiz Me!</button>
+  </div>
+
+  <div id="learnPhase">
+    <div class="ch-dots" id="chDots"></div>
+    <div id="chArea"></div>
+  </div>
+
+  <div id="quizPhase">
+    <div class="q-hud">
+      <div class="qhb"><span class="qhv" id="qhScore">0</span><span class="qhl">⭐ Score</span></div>
+      <div class="qhb"><span class="qhv" id="qhStreak">0🔥</span><span class="qhl">Streak</span></div>
+      <div class="qhb"><span class="qhv" id="qhNum">1/20</span><span class="qhl">Question</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="q-card" id="qCard">
+      <div class="q-top">
+        <span class="q-tag" id="qTag" style="color:var(--sky);border-color:var(--sky)55;background:var(--sky)12">🌍 Earth</span>
+        <span class="q-type-pill" id="qTypePill">CHOOSE</span>
+      </div>
+      <span class="q-emoji-big" id="qEmoji">🌍</span>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="q-sub"  id="qSub"></div>
+      <div class="hint-box" id="hintBox" onclick="showHint()">💡 Tap for a hint</div>
+      <div id="answerArea"></div>
+      <div class="fb" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">Next ➡️</button>
+    </div>
+  </div>
+
+  <div id="resultsSection">
+    <span class="r-trophy" id="rTrophy">🏆</span>
+    <div class="r-title" id="rTitle">Amazing, David!</div>
+    <div class="r-sub"   id="rSub"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="facts-learned">
+      <h3>🌍 Everything you learned today:</h3>
+      <div id="flList"></div>
+    </div>
+    <div class="ml-box" id="rMl"></div>
+    <div class="r-btns">
+      <button class="r-btn r-btn-learn" onclick="goLearn()">📖 Review Lesson</button>
+      <button class="r-btn r-btn-quiz"  onclick="goQuiz()">🔄 Try Quiz Again!</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const chapters = [
+  {
+    emoji:'🌋', title:'How Earth Was Born',
+    content:`
+      <p class="story">Our planet is <strong>4.6 billion years old</strong> — that's a number so big it's hard to
+      imagine! Earth formed from swirling dust and rocks spinning around our young Sun. <em>Billion = miliard
+      in Romanian, mil millones in Spanish!</em></p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🔥</span><div class="ft">Molten Ball</div><div class="fd">Early Earth was a glowing ball of melted rock — no oceans, no air to breathe, no life at all!</div></div>
+        <div class="fbox"><span class="fi">🌑</span><div class="ft">Birth of the Moon</div><div class="fd">Scientists think a planet the size of Mars smashed into Earth — the wreckage formed our Moon!</div></div>
+        <div class="fbox"><span class="fi">💀</span><div class="ft">The "Hadean" Eon</div><div class="fd">The first period of Earth's life is called the Hadean — named after Hades, the underworld — because it was so hot and hellish!</div></div>
+        <div class="fbox"><span class="fi">🌋</span><div class="ft">Volcanoes Everywhere</div><div class="fd">Thousands of volcanoes erupted constantly, filling the sky with ash, smoke and poisonous gases.</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">Earth is <strong>4.6 billion years old</strong> — if you tried to count to 4.6 billion, one number every second without stopping, it would take you <strong>over 145 YEARS!</strong></div></div>`,
+    facts:['Earth formed 4.6 billion years ago from dust and rock around the Sun','Early Earth was a molten ball of melted rock — far too hot for life','The Moon likely formed when a Mars-sized object smashed into Earth','The first time period is called the Hadean — named after the underworld!']
+  },
+  {
+    emoji:'🌊', title:'Early Earth & First Life',
+    content:`
+      <p class="story">Slowly, Earth cooled down. It rained for <strong>millions of years</strong> without
+      stopping, filling up the very first <strong>oceans</strong>. And in that ancient water, something
+      amazing happened...</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#ff6b35;background:rgba(255,107,53,.15)">🔥</div>
+          <div class="tl-label" style="color:#ff6b35">Hadean<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">4.6–4B BC<br>Molten Earth</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#90e0ef;background:rgba(144,224,239,.15)">🌊</div>
+          <div class="tl-label" style="color:#90e0ef">Archean<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">4–2.5B BC<br>First life!</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#7bed9f;background:rgba(123,237,159,.15)">🫧</div>
+          <div class="tl-label" style="color:#7bed9f">Proterozoic<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">2.5B–541M BC<br>Oxygen fills the air</span></div>
+        </div>
+      </div>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🦠</span><div class="ft">Tiny First Life</div><div class="fd">About 3.5–3.8 billion years ago, the very first living things appeared — tiny single-celled microbes, far smaller than a grain of sand!</div></div>
+        <div class="fbox"><span class="fi">🌬️</span><div class="ft">The Great Oxidation</div><div class="fd">Tiny microbes called cyanobacteria used sunlight to make food and released OXYGEN — slowly filling the air we now breathe!</div></div>
+      </div>
+      <div class="wow"><span class="wi">⏳</span><div class="wt">This early period is called the <strong>Precambrian</strong> — it covers about <strong>90% of ALL of Earth's history!</strong> Almost nothing but microbes for billions of years!</div></div>`,
+    facts:['The first oceans formed after millions of years of non-stop rain','The first tiny life appeared 3.5–3.8 billion years ago as single-celled microbes','Cyanobacteria filled Earth\'s air with oxygen for the very first time','The Precambrian covers about 90% of Earth\'s ENTIRE history!']
+  },
+  {
+    emoji:'🐟', title:'The Paleozoic Era — Life Explodes!',
+    content:`
+      <p class="story">About <strong>541 million years ago</strong>, something incredible happened — life
+      suddenly EXPLODED into thousands of new shapes and forms. Scientists call it the
+      <strong>Cambrian Explosion!</strong></p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🦞</span><div class="ft">Cambrian Explosion</div><div class="fd">In a geological instant, oceans filled with strange new creatures — trilobites, early shellfish and armoured swimmers!</div></div>
+        <div class="fbox"><span class="fi">🌿</span><div class="ft">Life Reaches Land</div><div class="fd">About 470 million years ago, the first simple plants crept onto land — followed by the first insects and amphibians!</div></div>
+        <div class="fbox"><span class="fi">🗺️</span><div class="ft">Pangaea Forms</div><div class="fd">All of Earth's continents slowly crashed together into ONE giant supercontinent called Pangaea (means "all Earth" in Greek)!</div></div>
+        <div class="fbox"><span class="fi">💀</span><div class="ft">The Great Dying</div><div class="fd">This era ended 252 million years ago with the WORST extinction ever — about 90% of all species on Earth died out!</div></div>
+      </div>
+      <div class="wow"><span class="wi">😱</span><div class="wt">"The Great Dying" was even <strong>BIGGER</strong> than the asteroid that later killed the dinosaurs! Nobody is 100% sure what caused it — but huge volcanoes are the top suspect!</div></div>`,
+    facts:['The Cambrian Explosion (541M years ago) filled oceans with new life forms','The first plants and insects moved onto land around 470 million years ago','Pangaea was a supercontinent made when all landmasses joined together','"The Great Dying" (252M years ago) killed 90% of species — Earth\'s biggest extinction ever']
+  },
+  {
+    emoji:'🦕', title:'The Mesozoic Era — Age of Dinosaurs',
+    content:`
+      <p class="story">You already know this era well — it's the <strong>Age of Dinosaurs!</strong> After the
+      Great Dying, life slowly recovered, and amazing reptiles began to rule the Earth.</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#ff6b35;background:rgba(255,107,53,.15)">🌋</div>
+          <div class="tl-label" style="color:#ff6b35">Triassic<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">252–201M BC</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#ffc107;background:rgba(255,193,7,.15)">🦕</div>
+          <div class="tl-label" style="color:#ffc107">Jurassic<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">201–145M BC</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#7bed9f;background:rgba(123,237,159,.15)">🦖</div>
+          <div class="tl-label" style="color:#7bed9f">Cretaceous<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">145–66M BC</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#f72585;background:rgba(247,37,133,.15)">☄️</div>
+          <div class="tl-label" style="color:#f72585">Extinction<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">66M BC</span></div>
+        </div>
+      </div>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🗺️</span><div class="ft">Pangaea Breaks Apart</div><div class="fd">During the Mesozoic, Pangaea slowly cracked and drifted apart into the separate continents we know today!</div></div>
+        <div class="fbox"><span class="fi">🦕</span><div class="ft">Dinosaurs Rule!</div><div class="fd">For 165 million years, dinosaurs were the largest and most powerful animals on land — you're already an expert on this part!</div></div>
+      </div>
+      <div class="wow"><span class="wi">☄️</span><div class="wt">This era ended <strong>66 million years ago</strong> when an asteroid hit Earth near Mexico — you've already learned all about this in your Dino Masterclass! 🦖</div></div>`,
+    facts:['The Mesozoic Era (252–66M years ago) is the Age of Dinosaurs','Pangaea broke apart during this era, forming the continents we know today','Dinosaurs ruled Earth for about 165 million years','The era ended 66 million years ago with the asteroid extinction']
+  },
+  {
+    emoji:'🐘', title:'The Cenozoic Era — Age of Mammals',
+    content:`
+      <p class="story">After the dinosaurs disappeared (except birds!), the world belonged to a new group of
+      animals — furry, warm-blooded <strong>mammals</strong>. This era is still happening right now!</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🐾</span><div class="ft">Mammals Take Over</div><div class="fd">With the giant dinosaurs gone, small mammals grew bigger and spread everywhere — eventually becoming elephants, whales, and more!</div></div>
+        <div class="fbox"><span class="fi">🥶</span><div class="ft">Ice Ages</div><div class="fd">Earth's climate has swung between warm periods and freezing Ice Ages. Woolly mammoths and sabre-tooth cats roamed the ice!</div></div>
+        <div class="fbox"><span class="fi">🐴</span><div class="ft">Evolving Giants</div><div class="fd">Whales evolved from small land animals that returned to the sea! Horses evolved from creatures the size of a dog!</div></div>
+        <div class="fbox"><span class="fi">🧑</span><div class="ft">Humans Arrive!</div><div class="fd">Modern humans appeared only about 300,000 years ago — an incredibly tiny sliver of Earth's 4.6 billion year story!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">If Earth's whole history was squeezed into <strong>ONE 24-hour day</strong>, humans would appear in the very <strong>last few seconds before midnight!</strong> Dinosaurs would already be gone by 11:40pm!</div></div>`,
+    facts:['The Cenozoic Era began 66 million years ago and continues today','Mammals spread and grew larger after the dinosaurs disappeared','Ice Ages brought woolly mammoths and sabre-tooth cats','Modern humans appeared only about 300,000 years ago — very recent!']
+  },
+  {
+    emoji:'🌍', title:'Earth Today & Its Restless Future',
+    content:`
+      <p class="story">Earth's story is still being written! Right now, under your feet, huge slabs of rock
+      called <strong>tectonic plates</strong> are slowly moving — Earth is still very much "alive."</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🐢</span><div class="ft">Slow but Sure</div><div class="fd">Continents move only a few centimetres each year — about as fast as your fingernails grow! But over millions of years, that adds up to huge changes.</div></div>
+        <div class="fbox"><span class="fi">🌋</span><div class="ft">Earthquakes & Volcanoes</div><div class="fd">Moving tectonic plates cause earthquakes and volcanic eruptions — proof that Earth's surface is always changing.</div></div>
+        <div class="fbox"><span class="fi">🗺️</span><div class="ft">A New Supercontinent?</div><div class="fd">Scientists predict that in about 250 million years, the continents may crash back together into a new supercontinent — sometimes called "Pangaea Proxima"!</div></div>
+        <div class="fbox"><span class="fi">🔬</span><div class="ft">Geology</div><div class="fd">The science of studying rocks and Earth's history is called geology — from Greo "geo" (Earth) + "logy" (study of).</div></div>
+      </div>
+      <p class="story">In Romanian, Earth is <strong>Pământ</strong> 🇷🇴 — in Spanish, it's <strong>Tierra</strong> 🇪🇸.
+      Whatever language you say it in, our planet has an incredible <strong>4.6-billion-year story</strong> —
+      and you're part of the newest, tiniest chapter! 🌟</p>`,
+    facts:['Tectonic plates move a few centimetres a year — as fast as fingernails grow!','Moving plates cause earthquakes and volcanic eruptions','In ~250 million years, continents may re-form a supercontinent ("Pangaea Proxima")','Geology is the science of studying rocks and Earth\'s history']
+  }
+];
+
+const questions = [
+  { cat:'🌋 Birth of Earth', type:'type', e:'🌋', col:'#ff6b35',
+    q:'About how many BILLION years old is planet Earth?',
+    sub:'A truly enormous number!',
+    hint:'Think of a number just under 5…',
+    accept:['4.6','4.5','4.7'],
+    ok:'🌟 4.6 billion years old! Earth has been around for an incredibly long time!',
+    err:'Earth is about 4.6 billion years old — one of the biggest numbers you\'ll ever use!' },
+
+  { cat:'🌋 Birth of Earth', type:'pick4', e:'🔥', col:'#ff6b35',
+    q:'What was early Earth covered in — no oceans, no life?',
+    sub:'It was extremely hot!',
+    hint:'Think of something a volcano makes…',
+    opts:['Oceans of water','Molten hot rock and volcanoes!','Ice and snow','Green forests'], c:1,
+    ok:'🔥 Molten hot rock! Early Earth was a glowing ball with volcanoes everywhere — far too hot for any life!',
+    err:'Molten hot rock and volcanoes! Early Earth had no oceans or life yet — it was much too hot!' },
+
+  { cat:'🌋 Birth of Earth', type:'pick4', e:'🌑', col:'#ff6b35',
+    q:'How do scientists think the Moon was formed?',
+    sub:'It involves a dramatic space collision!',
+    hint:'Something big crashed into something else…',
+    opts:['It was always there','A huge object crashed into Earth!','Aliens built it','It broke off the Sun'], c:1,
+    ok:'💥 A huge Mars-sized object smashed into Earth — the wreckage from that crash formed our Moon!',
+    err:'A Mars-sized object crashed into Earth! The leftover debris came together to form the Moon!' },
+
+  { cat:'🌊 First Life', type:'type', e:'🦠', col:'#90e0ef',
+    q:'About how many BILLION years ago did the first tiny life appear in the oceans?',
+    sub:'A little less than the age of Earth itself',
+    hint:'Somewhere between 3 and 4…',
+    accept:['3.5','3.8','3.6','3.7'],
+    ok:'🦠 About 3.5–3.8 billion years ago! Tiny single-celled microbes were the very first living things!',
+    err:'About 3.5–3.8 billion years ago — the first life was tiny microbes, far smaller than a grain of sand!' },
+
+  { cat:'🌊 First Life', type:'pick4', e:'🌬️', col:'#90e0ef',
+    q:'What tiny living things first filled Earth\'s air with oxygen?',
+    sub:'They used sunlight to make their food',
+    hint:'Not dinosaurs, not fish — something much, much smaller!',
+    opts:['Dinosaurs','Fish','Cyanobacteria (tiny microbes)!','Flowering plants'], c:2,
+    ok:'🌬️ Cyanobacteria! These tiny microbes used sunlight to make food and released the oxygen we breathe today!',
+    err:'Cyanobacteria — tiny microbes that used sunlight to make food and filled the air with oxygen!' },
+
+  { cat:'🌊 First Life', type:'pick4', e:'⏳', col:'#90e0ef',
+    q:'The Precambrian is a huge stretch of time. What fraction of Earth\'s WHOLE history does it cover?',
+    sub:'It\'s a much bigger chunk than you might think!',
+    hint:'Think almost the whole thing…',
+    opts:['Half','About 90%!','Just 10%','One year'], c:1,
+    ok:'⏳ About 90%! Almost all of Earth\'s history was the quiet Precambrian, mostly filled with just microbes!',
+    err:'About 90% of Earth\'s entire history is the Precambrian — nearly the whole story!' },
+
+  { cat:'🐟 Paleozoic Era', type:'type', e:'🦞', col:'#7bed9f',
+    q:'What is the name for the sudden burst of new animal life in the oceans about 541 million years ago?\nTwo words, starts with "Cambrian"',
+    sub:'Life seemed to "explode" into thousands of new shapes',
+    hint:'Cambrian Ex...?',
+    accept:['cambrian explosion'],
+    ok:'🦞 The Cambrian Explosion! Oceans suddenly filled with strange new creatures like trilobites!',
+    err:'The CAMBRIAN EXPLOSION! Around 541 million years ago, oceans suddenly filled with amazing new life!' },
+
+  { cat:'🐟 Paleozoic Era', type:'type', e:'🗺️', col:'#7bed9f',
+    q:'What was the name of the single supercontinent when ALL land was joined together?',
+    sub:'The name means "all Earth" in Greek',
+    hint:'Starts with "Pan"…',
+    accept:['pangaea','pangea'],
+    ok:'🗺️ PANGAEA! All of Earth\'s continents were once crashed together into this one giant supercontinent!',
+    err:'PANGAEA — meaning "all Earth" in Greek. Every continent was joined together as one!' },
+
+  { cat:'🐟 Paleozoic Era', type:'pick4', e:'💀', col:'#7bed9f',
+    q:'What was "The Great Dying" 252 million years ago?',
+    sub:'It happened at the very end of the Paleozoic Era',
+    hint:'Think about how many species survived… not many!',
+    opts:['The extinction that killed the dinosaurs','The biggest extinction ever — 90% of species died!','The day the Moon formed','The first Ice Age'], c:1,
+    ok:'💀 The biggest extinction EVER! About 90% of all species on Earth died out — even worse than the dinosaur extinction!',
+    err:'"The Great Dying" was Earth\'s BIGGEST extinction — about 90% of all species died out!' },
+
+  { cat:'🐟 Paleozoic Era', type:'pick4', e:'⚖️', col:'#7bed9f',
+    q:'Which extinction was actually BIGGER — the Permian "Great Dying" or the asteroid that killed the dinosaurs?',
+    sub:'This one might surprise you!',
+    hint:'Think about the percentage of species that died in each…',
+    opts:['The dinosaur asteroid was bigger','The Great Dying was much bigger!','They were exactly equal','Neither was very big'], c:1,
+    ok:'😱 The Great Dying was MUCH bigger — about 90% of species died, compared to about 75% in the dinosaur extinction!',
+    err:'The Great Dying (Permian extinction) was bigger — about 90% of species died, versus 75% for the dinosaurs!' },
+
+  { cat:'🦕 Mesozoic Era', type:'pick6', e:'⏳', col:'#ffc107',
+    q:'Which of these dinosaur time periods came FIRST?',
+    sub:'You already know this from the Dino Masterclass!',
+    hint:'T comes before J and C…',
+    opts:['Cretaceous','Jurassic','Triassic','Cenozoic','Precambrian','Permian'], c:2,
+    ok:'🌟 Triassic came first! Then Jurassic, then Cretaceous — T-J-C!',
+    err:'TRIASSIC came first! Remember T-J-C — Triassic, Jurassic, Cretaceous!' },
+
+  { cat:'🦕 Mesozoic Era', type:'type', e:'☄️', col:'#ffc107',
+    q:'What hit Earth 66 million years ago and ended the age of non-bird dinosaurs?',
+    sub:'It came from space!',
+    hint:'It\'s bigger than a meteor…',
+    accept:['asteroid','an asteroid'],
+    ok:'☄️ An asteroid! It struck near modern-day Mexico and ended the Mesozoic Era!',
+    err:'An ASTEROID hit Earth 66 million years ago, ending the age of dinosaurs!' },
+
+  { cat:'🐘 Cenozoic Era', type:'pick4', e:'🐾', col:'#c77dff',
+    q:'After the dinosaurs died out (except birds), which animals took over the Earth?',
+    sub:'They are warm-blooded and often furry',
+    hint:'Think of elephants, whales, and humans…',
+    opts:['Insects','Mammals!','Fish','Reptiles only'], c:1,
+    ok:'🐘 Mammals! With the giant dinosaurs gone, mammals spread everywhere and grew much bigger!',
+    err:'MAMMALS took over after the dinosaurs disappeared — that includes elephants, whales, and us!' },
+
+  { cat:'🐘 Cenozoic Era', type:'pick4', e:'🧑', col:'#c77dff',
+    q:'About how many YEARS ago did modern humans first appear?',
+    sub:'Hint: think thousands, not millions or billions!',
+    hint:'It\'s a very, very recent number compared to Earth\'s age…',
+    opts:['About 4.6 billion years ago','About 300,000 years ago!','About 5,000 years ago','Yesterday'], c:1,
+    ok:'🧑 About 300,000 years ago! That sounds like a lot, but it\'s a tiny blink compared to Earth\'s 4.6 billion years!',
+    err:'About 300,000 years ago — humans are incredibly new compared to the rest of Earth\'s story!' },
+
+  { cat:'🐘 Cenozoic Era', type:'pick4', e:'🥶', col:'#c77dff',
+    q:'Which animal lived during the Ice Age and had huge curved tusks?',
+    sub:'It looked like a giant hairy elephant',
+    hint:'Its name starts with "Woolly"…',
+    opts:['T-Rex','Woolly Mammoth!','Triceratops','Pterodactyl'], c:1,
+    ok:'🥶 The Woolly Mammoth! It lived during the Ice Age, covered in thick fur to survive the cold!',
+    err:'The WOOLLY MAMMOTH — a giant furry relative of elephants that lived through the Ice Age!' },
+
+  { cat:'🐘 Cenozoic Era', type:'pick4', e:'🕐', col:'#c77dff',
+    q:'If Earth\'s WHOLE history was squeezed into ONE 24-hour day, when would humans appear?',
+    sub:'Think about how recent humans really are',
+    hint:'Not morning, not afternoon…',
+    opts:['At 6:00 in the morning','In the very last few seconds before midnight!','At lunchtime','Right at the very start'], c:1,
+    ok:'🤯 In the last few seconds before midnight! Humans are an incredibly tiny part of Earth\'s huge story!',
+    err:'In the very LAST FEW SECONDS before midnight! Humans have only just arrived on Earth\'s timescale!' },
+
+  { cat:'🌍 Earth Today', type:'type', e:'🌋', col:'#f72585',
+    q:'What is the name for Earth\'s huge, moving rocky plates that cause earthquakes?\nTwo words: "___ plates"',
+    sub:'They carry the continents around, very slowly',
+    hint:'Starts with "tectonic"…',
+    accept:['tectonic plates','plate tectonics'],
+    ok:'🌋 Tectonic plates! These huge slabs of rock move very slowly and cause earthquakes and volcanoes!',
+    err:'TECTONIC PLATES — huge slabs of rock that move slowly and cause earthquakes and volcanoes!' },
+
+  { cat:'🌍 Earth Today', type:'pick4', e:'🐢', col:'#f72585',
+    q:'About how fast do continents move each year?',
+    sub:'It\'s much slower than you might expect!',
+    hint:'Think of something small that grows slowly on your hands…',
+    opts:['100 km per year','As fast as your fingernails grow (a few cm)!','1,000 km per year','They don\'t move at all'], c:1,
+    ok:'🐢 As fast as your fingernails grow! Just a few centimetres a year — but it adds up over millions of years!',
+    err:'About as fast as your FINGERNAILS grow — just a few cm a year, but it adds up hugely over time!' },
+
+  { cat:'🌍 Earth Today', type:'pick4', e:'🗺️', col:'#f72585',
+    q:'Scientists think in about 250 million years, the continents might join together again. What do some scientists call this future supercontinent?',
+    sub:'It sounds a bit like an ancient supercontinent you already know!',
+    hint:'It shares its first word with "Pangaea"…',
+    opts:['Pangaea Proxima!','New York','Atlantis','Gondwana Prime'], c:0,
+    ok:'🗺️ Pangaea Proxima! In the far future, the continents may crash back together once again!',
+    err:'PANGAEA PROXIMA — some scientists think the continents will rejoin in about 250 million years!' },
+
+  { cat:'🌍 Grand Finale!', type:'type', e:'🔬', col:'#ffc107',
+    q:'What is the name for the science of studying rocks and Earth\'s history?\nGeo = Earth + logy = study of',
+    sub:'Scientists who do this are called geologists',
+    hint:'Geo-...-ogy',
+    accept:['geology'],
+    ok:'🏆 GEOLOGY! The science of studying rocks and Earth\'s incredible 4.6-billion-year story!',
+    err:'GEOLOGY — geo (Earth) + logy (study of). Could be YOUR future career, David! 🌍🔬' },
+];
+
+let chIdx=0, seenChs=new Set([0]);
+let qIdx=0, score=0, streak=0, bestStreak=0, answered=false, hintShown=false;
+
+const flEl=document.getElementById('floaters');
+const fIcons=['🌍','🌋','🦠','🐟','🦕','🐘','☄️','🗺️','⏳','🌊','🔬','🧊','🌡️','🪨','🧑','🐾'];
+for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=fIcons[Math.floor(Math.random()*fIcons.length)];s.style.left=(Math.random()*100)+'%';s.style.fontSize=(.9+Math.random()*1.3)+'rem';s.style.animationDuration=(9+Math.random()*13)+'s';s.style.animationDelay=(Math.random()*10)+'s';flEl.appendChild(s);}
+
+function buildDots(){
+  const dc=document.getElementById('chDots'); dc.innerHTML='';
+  chapters.forEach((ch,i)=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(i===chIdx?' active':seenChs.has(i)?' done':'');
+    d.textContent=ch.emoji;
+    d.onclick=()=>{chIdx=i;seenChs.add(i);buildDots();renderCh();};
+    dc.appendChild(d);
+  });
+}
+
+function renderCh(){
+  const ch=chapters[chIdx];
+  const isLast=chIdx===chapters.length-1;
+  const area=document.getElementById('chArea');
+  area.innerHTML=`<div class="ch-card" id="chCard">
+    <div class="ch-num">Chapter ${chIdx+1} of ${chapters.length}</div>
+    <div class="ch-title">${ch.emoji} ${ch.title}</div>
+    ${ch.content}
+    <div class="ch-nav">
+      ${chIdx>0?`<button class="ch-btn ch-prev" onclick="moveCh(-1)">⬅️ Back</button>`:''}
+      ${!isLast
+        ?`<button class="ch-btn ch-next" onclick="moveCh(1)">Next Chapter ➡️</button>`
+        :`<button class="ch-btn ch-quiz" onclick="goQuiz()">⚡ Ready — Quiz me!</button>`}
+    </div>
+  </div>`;
+  const card=document.getElementById('chCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function moveCh(dir){
+  chIdx=Math.max(0,Math.min(chapters.length-1,chIdx+dir));
+  seenChs.add(chIdx); buildDots(); renderCh();
+}
+
+function goLearn(){
+  document.getElementById('learnPhase').style.display='block';
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.add('active');
+  document.getElementById('tabQuiz').classList.remove('active');
+}
+
+function goQuiz(){
+  document.getElementById('learnPhase').style.display='none';
+  document.getElementById('quizPhase').style.display='block';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.remove('active');
+  document.getElementById('tabQuiz').classList.add('active');
+  qIdx=0; score=0; streak=0; bestStreak=0; answered=false; hintShown=false;
+  document.getElementById('qhScore').textContent='0';
+  document.getElementById('qhStreak').textContent='0🔥';
+  renderQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQ(){
+  answered=false; hintShown=false;
+  const q=questions[qIdx];
+  document.getElementById('qhNum').textContent=`${qIdx+1}/${questions.length}`;
+  document.getElementById('progFill').style.width=((qIdx/questions.length)*100)+'%';
+  document.getElementById('qTypePill').textContent=q.type==='type'?'⌨️ TYPE IT':'🖱️ CHOOSE';
+  document.getElementById('qEmoji').textContent=q.e;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qSub').textContent=q.sub||'';
+
+  const tag=document.getElementById('qTag');
+  tag.textContent=q.cat; tag.style.color=q.col; tag.style.borderColor=q.col+'55'; tag.style.background=q.col+'12';
+
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  const hb=document.getElementById('hintBox'); hb.className='hint-box'; hb.textContent='💡 Tap for a hint';
+
+  const aa=document.getElementById('answerArea'); aa.innerHTML='';
+  if(q.type==='type'){
+    aa.innerHTML=`<div class="type-wrap">
+      <input class="type-input" id="typeIn" placeholder="Type your answer…" autocomplete="off" spellcheck="false"/>
+      <button class="submit-btn" id="subBtn" onclick="submitType()">✅ Check Answer</button>
+    </div>`;
+    const inp=document.getElementById('typeIn');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitType();});
+    setTimeout(()=>inp.focus(),100);
+  } else {
+    const grid=document.createElement('div');
+    grid.className=q.type==='pick6'?'opts-6':'opts-4';
+    q.opts.forEach((opt,i)=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt;
+      btn.onclick=()=>pickOpt(i,btn); grid.appendChild(btn);
+    });
+    aa.appendChild(grid);
+  }
+  const card=document.getElementById('qCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+}
+
+function showHint(){
+  if(hintShown||answered)return;
+  hintShown=true;
+  const hb=document.getElementById('hintBox');
+  hb.className='hint-box shown'; hb.textContent='💡 Hint: '+questions[qIdx].hint;
+}
+
+function submitType(){
+  if(answered)return;
+  const inp=document.getElementById('typeIn'), val=inp.value.trim().toLowerCase();
+  if(!val){inp.focus();return;}
+  const q=questions[qIdx];
+  const correct=q.accept.some(a=>val===a.toLowerCase());
+  inp.disabled=true; document.getElementById('subBtn').disabled=true;
+  inp.className='type-input '+(correct?'ok-in':'err-in');
+  processAns(correct,q);
+}
+
+function pickOpt(chosen,btn){
+  if(answered)return;
+  const q=questions[qIdx];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const correct=chosen===q.c;
+  if(correct) btn.classList.add('correct');
+  else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.c].classList.add('correct'); }
+  processAns(correct,q);
+}
+
+function processAns(correct,q){
+  answered=true;
+  const fb=document.getElementById('fb'); fb.style.display='block';
+  if(correct){
+    const pts=10+(streak>=2?5:0)+(!hintShown?3:0);
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak;
+    document.getElementById('qhScore').textContent=score;
+    document.getElementById('qhStreak').textContent=streak+'🔥';
+    fb.className='fb ok';
+    fb.textContent=q.ok+(streak>=3?` 🔥 ${streak} in a row!`:'')+(!hintShown?' ⭐ No-hint bonus!':'');
+  } else {
+    streak=0; document.getElementById('qhStreak').textContent='0🔥';
+    fb.className='fb err'; fb.textContent=q.err;
+  }
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=questions.length) showResults();
+  else renderQ();
+}
+
+function showResults(){
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('progFill').style.width='100%';
+
+  const rawPct = score / (questions.length * 10);
+
+  let trophy,title,sub;
+  if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — you ARE an Earth History champion! 🌍👑`;}
+  else if(rawPct>=.8){trophy='🥇';title='Earth Expert, David!';sub=`${score} points! Outstanding knowledge across all of Earth's history! 🔥`;}
+  else if(rawPct>=.6){trophy='🥈';title='Brilliant work, David!';sub=`${score} points! Really impressive knowledge! Go over the chapters and try again! 💪`;}
+  else if(rawPct>=.4){trophy='🌍';title='Good effort, David!';sub=`${score} points! Re-read the lesson and try again — you'll smash it! 🚀`;}
+  else               {trophy='🪨';title='Keep going, David!';sub=`${score} points! Read every chapter carefully first, then try the quiz. You can do it! 💪`;}
+
+  document.getElementById('rTrophy').textContent=trophy;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rStars').textContent=rawPct>=1?'⭐⭐⭐⭐⭐':rawPct>=.8?'⭐⭐⭐⭐':rawPct>=.6?'⭐⭐⭐':rawPct>=.4?'⭐⭐':'⭐';
+
+  const fl2=document.getElementById('flList'); fl2.innerHTML='';
+  chapters.forEach(ch=>{
+    ch.facts.forEach(f=>{
+      const d=document.createElement('div'); d.className='fl-row';
+      d.innerHTML=`<span style="font-size:.9rem;flex-shrink:0">🌍</span><span>${f}</span>`; fl2.appendChild(d);
+    });
+  });
+
+  const ml=document.getElementById('rMl');
+  if(rawPct>=.7){
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Incredible, David! From molten rock to dinosaurs to humans — you know Earth's WHOLE story! 🌍👑</p>
+      <p class="ro">🇷🇴 Incredibil, David! De la roci topite la dinozauri și oameni — cunoști întreaga poveste a Pământului! 🌟</p>
+      <p class="es">🇪🇸 ¡Increíble, David! ¡Desde roca fundida hasta los dinosaurios y los humanos — conoces toda la historia de la Tierra! 🏆</p>`;
+  } else {
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Good effort, David! Read the chapters again carefully then retake the quiz — you'll do much better! 💪</p>
+      <p class="ro">🇷🇴 Efort bun, David! Recitește capitolele cu atenție și încearcă din nou — vei reuși! 📚</p>
+      <p class="es">🇪🇸 ¡Buen esfuerzo, David! ¡Vuelve a leer los capítulos e inténtalo de nuevo! 🔄</p>`;
+  }
+  if(rawPct>=.6) launchConfetti();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function launchConfetti(){
+  const cols=['#ffc107','#7bed9f','#ff6b35','#f72585','#90e0ef','#c77dff','#e8d5b0'];
+  for(let i=0;i<90;i++){setTimeout(()=>{const c=document.createElement('div');c.className='cp';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(1.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);},i*20);}
+}
+
+buildDots(); renderCh();
+</script>
+</body>
+</html>
