@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Practice Arena 🏆</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060e06; --green:#52b788; --lime:#7bed9f; --amber:#ffc107;
+    --fire:#ff6b35; --bone:#e8d5b0; --red:#f72585; --sky:#90e0ef;
+    --purple:#c77dff; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse at 15% 20%,rgba(199,125,255,.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(82,183,136,.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#060e06 0%,#020802 100%);}
+  .floaters{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .floaters span{position:absolute;opacity:.05;animation:floatUp linear infinite;}
+  @keyframes floatUp{0%{transform:translateY(105vh) rotate(0deg);opacity:0}5%{opacity:.05}95%{opacity:.05}100%{transform:translateY(-5vh) rotate(25deg);opacity:0}}
+
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:20px 14px 70px;}
+
+  .hdr{text-align:center;margin-bottom:20px;animation:dropIn .6s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes dropIn{from{transform:translateY(-44px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .hdr-badge{display:inline-block;background:rgba(199,125,255,.1);border:1.5px solid rgba(199,125,255,.3);border-radius:50px;padding:5px 16px;font-size:.78rem;font-weight:800;color:var(--purple);letter-spacing:.5px;margin-bottom:8px;}
+  .hdr h1{font-family:'Boogaloo',cursive;font-size:clamp(1.9rem,6vw,3rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800,0 0 30px rgba(255,193,7,.2);}
+  .hdr p{color:rgba(255,255,255,.4);font-weight:700;font-size:.88rem;margin-top:5px;}
+
+  /* HOME MENU */
+  #homeScreen .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px;}
+  .mcard{position:relative;text-align:left;display:block;border:none;cursor:pointer;text-decoration:none;border-radius:20px;padding:18px 16px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);transition:all .22s cubic-bezier(.34,1.56,.64,1);animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;width:100%;font-family:'Nunito',sans-serif;}
+  @keyframes cardIn{from{transform:scale(.92) translateY(14px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .mcard:hover{transform:translateY(-4px) scale(1.02);border-color:var(--accent,var(--amber));box-shadow:0 10px 26px rgba(0,0,0,.35),0 0 20px var(--glow,rgba(255,193,7,.18));}
+  .mcard .memoji{font-size:2.4rem;display:block;margin-bottom:8px;animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  .mcard .mtitle{font-family:'Boogaloo',cursive;font-size:1.25rem;color:var(--amber);margin-bottom:4px;text-shadow:1px 1px 0 #5a3800;}
+  .mcard .mdesc{font-size:.78rem;color:rgba(255,255,255,.6);font-weight:700;line-height:1.5;}
+  .mcard.reasoning{--accent:#c77dff;--glow:rgba(199,125,255,.22);}
+  .mcard.grammar{--accent:#ff6b35;--glow:rgba(255,107,53,.22);}
+  .mcard.math{--accent:#7bed9f;--glow:rgba(123,237,159,.22);}
+  .mcard.science{--accent:#90e0ef;--glow:rgba(144,224,239,.22);}
+  .mcard.mixed{--accent:#ffc107;--glow:rgba(255,193,7,.22);grid-column:1/-1;}
+
+  .level-note{background:rgba(255,255,255,.04);border:1.5px dashed rgba(255,255,255,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.8rem;color:rgba(255,255,255,.6);font-weight:700;line-height:1.6;text-align:center;}
+  .level-note strong{color:var(--amber);}
+
+  /* QUIZ SCREEN */
+  #quizScreen{display:none;}
+  .q-hud{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;}
+  .qhb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:9px 4px;text-align:center;}
+  .qhb .qhv{font-family:'Boogaloo',cursive;font-size:1.15rem;color:white;display:block;line-height:1.1;}
+  .qhb .qhl{font-size:.58rem;color:rgba(255,255,255,.35);font-weight:800;text-transform:uppercase;}
+  .qhb.lvl .qhv{color:var(--purple);}
+
+  .prog-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px rgba(123,237,159,.4);}
+
+  .q-card{border-radius:26px;padding:26px 22px 22px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  .q-top{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .q-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:1.5px solid;}
+  .q-type-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:800;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);}
+  .q-emoji-big{font-size:3rem;display:block;text-align:center;margin-bottom:10px;animation:sway 3s ease-in-out infinite;}
+  .q-text{font-family:'Boogaloo',cursive;font-size:clamp(1.05rem,3.5vw,1.4rem);color:white;text-align:center;line-height:1.35;margin-bottom:8px;white-space:pre-line;}
+  .q-sub{font-size:.8rem;color:rgba(255,255,255,.4);text-align:center;font-weight:700;margin-bottom:14px;line-height:1.5;font-style:italic;}
+
+  .hint-box{background:rgba(255,193,7,.07);border:1.5px dashed rgba(255,193,7,.25);border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:.8rem;color:rgba(255,193,7,.7);font-weight:700;text-align:center;cursor:pointer;transition:all .2s;}
+  .hint-box:hover{background:rgba(255,193,7,.12);}
+  .hint-box.shown{cursor:default;color:var(--amber);border-style:solid;}
+
+  .opts-4{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .opts-6{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .opt{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:14px;padding:13px 8px;cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;color:white;text-align:center;line-height:1.3;}
+  .opt:hover:not(:disabled){background:rgba(82,183,136,.12);border-color:rgba(82,183,136,.4);transform:scale(1.03);}
+  .opt.correct{background:rgba(123,237,159,.22)!important;border-color:var(--lime)!important;animation:pop .35s cubic-bezier(.34,1.56,.64,1);}
+  .opt.wrong{background:rgba(247,37,133,.15)!important;border-color:var(--red)!important;animation:shk .3s ease;}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .type-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .type-input{width:100%;max-width:400px;padding:14px 18px;background:rgba(255,255,255,.07);border:2.5px solid rgba(255,255,255,.18);border-radius:16px;font-family:'Boogaloo',cursive;font-size:1.4rem;color:white;text-align:center;outline:none;transition:all .2s;caret-color:var(--amber);}
+  .type-input::placeholder{color:rgba(255,255,255,.22);font-size:1rem;}
+  .type-input:focus{border-color:rgba(255,193,7,.6);box-shadow:0 0 20px rgba(255,193,7,.15);}
+  .type-input.ok-in{border-color:var(--lime);background:rgba(123,237,159,.08);}
+  .type-input.err-in{border-color:var(--red);background:rgba(247,37,133,.07);}
+  .submit-btn{padding:13px 34px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .submit-btn:hover{transform:translateY(-2px);}
+  .submit-btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  .fb{border-radius:13px;padding:13px 16px;margin-top:13px;font-weight:700;font-size:.88rem;line-height:1.55;animation:fadeUp .3s ease both;display:none;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .fb.ok{background:rgba(123,237,159,.1);border:1.5px solid var(--lime);color:#b7f5c8;}
+  .fb.err{background:rgba(247,37,133,.08);border:1.5px solid var(--red);color:#ffaacc;}
+  .fb .lvltag{display:block;margin-top:6px;font-size:.78rem;color:var(--purple);font-weight:900;}
+
+  .next-btn{display:none;width:100%;margin-top:12px;padding:14px;border:none;border-radius:50px;cursor:pointer;transition:all .2s;font-family:'Boogaloo',cursive;font-size:1.15rem;color:#060e06;background:linear-gradient(135deg,var(--amber),var(--fire));box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .next-btn:hover{transform:translateY(-2px);}
+
+  .quit-link{display:block;text-align:center;margin-top:10px;font-size:.76rem;color:rgba(255,255,255,.3);font-weight:700;cursor:pointer;text-decoration:underline;}
+  .quit-link:hover{color:rgba(255,255,255,.5);}
+
+  /* RESULTS */
+  #resultsSection{display:none;text-align:center;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  .r-trophy{font-size:5.5rem;display:block;margin-bottom:12px;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .r-title{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800;margin-bottom:6px;}
+  .r-sub{color:rgba(255,255,255,.5);font-weight:700;font-size:.95rem;margin-bottom:18px;}
+  .r-stars{font-size:2rem;letter-spacing:6px;margin-bottom:18px;}
+  .facts-learned{background:var(--card);border:1.5px solid rgba(199,125,255,.2);border-radius:18px;padding:16px;margin-bottom:16px;text-align:left;}
+  .facts-learned h3{font-family:'Boogaloo',cursive;color:var(--amber);font-size:1rem;margin-bottom:12px;}
+  .fl-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:.85rem;color:rgba(255,255,255,.8);font-weight:700;line-height:1.45;}
+  .fl-row .flv{color:var(--purple);font-family:'Boogaloo',cursive;font-size:1rem;}
+  .ml-box{background:rgba(255,255,255,.03);border:1.5px solid rgba(144,224,239,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.83rem;text-align:left;}
+  .ml-box p{margin-bottom:5px;line-height:1.55;}
+  .ml-box .en{color:var(--amber);font-weight:800;}
+  .ml-box .ro{color:var(--lime);font-weight:800;}
+  .ml-box .es{color:var(--sky);font-weight:800;}
+  .r-btns{display:flex;gap:10px;}
+  .r-btn{flex:1;padding:14px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;color:#060e06;}
+  .r-btn-learn{background:rgba(255,255,255,.08);color:white;border:2px solid var(--border);}
+  .r-btn-learn:hover{background:rgba(255,255,255,.13);}
+  .r-btn-quiz{background:linear-gradient(135deg,var(--lime),var(--green));box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .r-btn-quiz:hover{transform:scale(1.03);}
+
+  .cp{position:fixed;width:9px;height:9px;top:-9px;border-radius:2px;animation:cf linear forwards;z-index:999;pointer-events:none;}
+  @keyframes cf{to{transform:translateY(106vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="floaters" id="floaters"></div>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-badge">🏆 PRACTICE ARENA — REASONING · GRAMMAR · MATH · SCIENCE</div>
+    <h1>David's Practice Arena! 🚀</h1>
+    <p>Pick a subject — the difficulty adjusts to YOU as you go!</p>
+  </div>
+
+  <!-- HOME -->
+  <div id="homeScreen">
+    <div class="grid">
+      <button class="mcard reasoning" onclick="startSession('reasoning')">
+        <span class="memoji">🧩</span>
+        <div class="mtitle">Reasoning</div>
+        <div class="mdesc">Sequences, codes, logic puzzles &amp; brain-benders.</div>
+      </button>
+      <button class="mcard grammar" onclick="startSession('grammar')">
+        <span class="memoji">✏️</span>
+        <div class="mtitle">Grammar</div>
+        <div class="mdesc">Word classes, punctuation, sentence structure.</div>
+      </button>
+      <button class="mcard math" onclick="startSession('math')">
+        <span class="memoji">➕</span>
+        <div class="mtitle">Maths</div>
+        <div class="mdesc">Number, fractions, shape, word problems.</div>
+      </button>
+      <button class="mcard science" onclick="startSession('science')">
+        <span class="memoji">🔬</span>
+        <div class="mtitle">Science</div>
+        <div class="mdesc">Electricity, sound, matter, body &amp; more.</div>
+      </button>
+      <button class="mcard mixed" onclick="startSession('mixed')">
+        <span class="memoji">🎲</span>
+        <div class="mtitle">Mixed Challenge — All 4 Subjects!</div>
+        <div class="mdesc">Questions shuffle across every subject at once. The ultimate test!</div>
+      </button>
+    </div>
+    <div class="level-note">🌱 Every session starts at <strong>Year 4</strong> level. Get 3 right in a row and it gets <strong>harder</strong>. Get 2 wrong in a row and it eases back — no need to pick the "right" level, David, just start playing!</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quizScreen">
+    <div class="q-hud">
+      <div class="qhb"><span class="qhv" id="qhScore">0</span><span class="qhl">⭐ Score</span></div>
+      <div class="qhb"><span class="qhv" id="qhStreak">0🔥</span><span class="qhl">Streak</span></div>
+      <div class="qhb lvl"><span class="qhv" id="qhLevel">Y4</span><span class="qhl">Level</span></div>
+      <div class="qhb"><span class="qhv" id="qhNum">1/20</span><span class="qhl">Question</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="q-card" id="qCard">
+      <div class="q-top">
+        <span class="q-tag" id="qTag" style="color:var(--amber);border-color:var(--amber)55;background:var(--amber)12">Subject</span>
+        <span class="q-type-pill" id="qTypePill">CHOOSE</span>
+      </div>
+      <span class="q-emoji-big" id="qEmoji">🧩</span>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="q-sub"  id="qSub"></div>
+      <div class="hint-box" id="hintBox" onclick="showHint()">💡 Tap for a hint</div>
+      <div id="answerArea"></div>
+      <div class="fb" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">Next ➡️</button>
+    </div>
+    <div class="quit-link" onclick="goHome()">⬅️ Back to subject menu</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsSection">
+    <span class="r-trophy" id="rTrophy">🏆</span>
+    <div class="r-title" id="rTitle">Amazing, David!</div>
+    <div class="r-sub"   id="rSub"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="facts-learned">
+      <h3>📊 Session Summary</h3>
+      <div id="flList"></div>
+    </div>
+    <div class="ml-box" id="rMl"></div>
+    <div class="r-btns">
+      <button class="r-btn r-btn-learn" onclick="goHome()">🏠 Subject Menu</button>
+      <button class="r-btn r-btn-quiz"  onclick="startSession(lastMode)">🔄 Go Again!</button>
+    </div>
+  </div>
+
+</div>
+<script>
+// ═══════════════════════════════════════════════
+//  QUESTION BANK — subject → level(1-5) → questions
+// ═══════════════════════════════════════════════
+const bank = {
+reasoning: {
+  1: [
+    { e:'🍎', q:'Which one does NOT belong?', sub:'Think about what makes 3 of them the same', hint:'Three of these are fruit…', type:'pick4', opts:['Apple','Banana','Carrot','Orange'], c:2,
+      ok:'🎯 Carrot! It\'s a vegetable — the rest are all fruit!', err:'CARROT is the odd one out — it\'s a vegetable, the rest are fruit!' },
+    { e:'🔢', q:'What comes next?\n2, 4, 6, 8, __', sub:'Each number goes up by the same amount', hint:'Add 2 each time…', type:'pick4', opts:['9','10','12','7'], c:1,
+      ok:'🎯 10! The pattern adds 2 each time: 2,4,6,8,10!', err:'10! Each number is 2 more than the last: 2,4,6,8,10!' },
+    { e:'🔺', q:'Which shape has exactly 3 sides?', sub:'Count carefully!', hint:'Its name starts with "Tri"…', type:'pick4', opts:['Square','Circle','Triangle','Pentagon'], c:2,
+      ok:'🎯 Triangle! Tri means three — three sides!', err:'TRIANGLE has 3 sides — tri means three!' },
+    { e:'🚂', q:'A train has 8 wheels. A car has 4 wheels. How many MORE wheels does the train have?', sub:'Simple subtraction', hint:'8 take away 4…', type:'type', accept:['4'],
+      ok:'🎯 4 more wheels! 8 − 4 = 4', err:'4 more wheels! 8 − 4 = 4' },
+  ],
+  2: [
+    { e:'🐾', q:'Which one does NOT belong?', sub:'Three of these have something in common', hint:'Three are animals…', type:'pick4', opts:['Dog','Cat','Fish','Chair'], c:3,
+      ok:'🎯 Chair! It\'s not an animal — the rest are!', err:'CHAIR is the odd one out — it\'s furniture, not an animal!' },
+    { e:'🔢', q:'What comes next?\n3, 6, 9, 12, __', sub:'A multiplication pattern', hint:'Add 3 each time…', type:'type', accept:['15'],
+      ok:'🎯 15! Each number is 3 more: the 3-times table!', err:'15! The pattern is the 3-times table: 3,6,9,12,15' },
+    { e:'📏', q:'Tom is taller than Ben. Ben is taller than Sam. Who is the SHORTEST?', sub:'Think about the order carefully', hint:'Draw them tallest to shortest…', type:'pick4', opts:['Tom','Ben','Sam','Can\'t tell'], c:2,
+      ok:'🎯 Sam! Order: Tom (tallest) → Ben → Sam (shortest)', err:'SAM is shortest! Order: Tom → Ben → Sam' },
+    { e:'📖', q:'Book is to Reading as Fork is to ___?', sub:'Think about what each thing is used FOR', hint:'What do you do with a fork?', type:'pick4', opts:['Writing','Eating','Drawing','Sleeping'], c:1,
+      ok:'🎯 Eating! A book is used for reading, a fork is used for eating!', err:'EATING! Just like a book is for reading, a fork is for eating!' },
+  ],
+  3: [
+    { e:'🔢', q:'What comes next?\n1, 4, 9, 16, __', sub:'Hint: these are special numbers you get by multiplying a number by itself', hint:'1×1, 2×2, 3×3, 4×4, __×__?', type:'type', accept:['25'],
+      ok:'🎯 25! These are SQUARE numbers: 1,4,9,16,25 (5×5=25)', err:'25! Square numbers: 1×1, 2×2, 3×3, 4×4, 5×5=25' },
+    { e:'🔐', q:'In a secret code, each letter shifts forward by 1: CAT becomes DBU. What does DOG become using the same code?', sub:'Shift every letter forward by one', hint:'D→E, O→P, G→H', type:'pick4', opts:['EPH','EPI','FQH','DPH'], c:0,
+      ok:'🎯 EPH! D→E, O→P, G→H', err:'EPH! Shift each letter forward by 1: D→E, O→P, G→H' },
+    { e:'👥', q:'Amy is older than Ben. Ben is older than Cara. Cara is older than Dan. Who is the OLDEST?', sub:'Line them up in order', hint:'Amy is mentioned first as older than everyone else…', type:'pick4', opts:['Amy','Ben','Cara','Dan'], c:0,
+      ok:'🎯 Amy! Order: Amy → Ben → Cara → Dan (oldest to youngest)', err:'AMY is oldest! Order: Amy → Ben → Cara → Dan' },
+    { e:'🔢', q:'Which number does NOT belong?\n2, 4, 6, 9, 8', sub:'Think about odd and even numbers', hint:'Four of these are even…', type:'pick4', opts:['2','4','6','9','8'], c:3,
+      ok:'🎯 9! It\'s the only ODD number — the rest are all even!', err:'9 is the odd one out — it\'s the only odd number, the rest are even!' },
+  ],
+  4: [
+    { e:'🔢', q:'What comes next?\n2, 6, 18, 54, __', sub:'Each number is multiplied by the same amount', hint:'Try multiplying by 3…', type:'type', accept:['162'],
+      ok:'🎯 162! Each number is ×3: 2,6,18,54,162', err:'162! The pattern is ×3 each time: 54 × 3 = 162' },
+    { e:'🧠', q:'All Zorbs are Flurbs. All Flurbs are Grimps. Are ALL Zorbs definitely Grimps?', sub:'Think it through step by step, like a chain', hint:'Zorb → Flurb → Grimp, it\'s a chain…', type:'pick4', opts:['Yes','No','Maybe','Not enough info'], c:0,
+      ok:'🎯 Yes! It\'s a logical chain: Zorb→Flurb→Grimp, so every Zorb must be a Grimp!', err:'YES! Since Zorbs are Flurbs, and Flurbs are Grimps, Zorbs must be Grimps too!' },
+    { e:'🏁', q:'In a race: Ben finished first. Sam finished after Ben but before Amy. Who finished 2nd?', sub:'Work out the full order: 1st, 2nd, 3rd', hint:'Ben is 1st. Who is right after Ben?', type:'pick4', opts:['Sam','Amy','Ben','Can\'t tell'], c:0,
+      ok:'🎯 Sam! Order: Ben (1st) → Sam (2nd) → Amy (3rd)', err:'SAM finished 2nd! Order: Ben → Sam → Amy' },
+    { e:'🔐', q:'In a code, each letter shifts forward by 1 (PENCIL → QFODJM). What does BOOK become?', sub:'Shift every letter forward by one', hint:'B→C, O→P, O→P, K→L', type:'pick4', opts:['CPPL','CPOL','BPPL','CPPK'], c:0,
+      ok:'🎯 CPPL! B→C, O→P, O→P, K→L', err:'CPPL! Shift each letter forward by 1: B→C, O→P, O→P, K→L' },
+  ],
+  5: [
+    { e:'🔢', q:'What comes next?\n1, 1, 2, 3, 5, 8, __', sub:'Each number is the sum of the two before it', hint:'5 + 8 = ?', type:'type', accept:['13'],
+      ok:'🎯 13! This is the famous FIBONACCI sequence — each number is the sum of the two before it!', err:'13! It\'s the Fibonacci sequence: 5 + 8 = 13' },
+    { e:'📏', q:'Kate is taller than Leo. Mia is taller than Kate. Who is the SHORTEST of the three?', sub:'Order them from tallest to shortest', hint:'Mia > Kate > Leo…', type:'pick4', opts:['Kate','Leo','Mia','Can\'t tell'], c:1,
+      ok:'🎯 Leo! Order: Mia (tallest) → Kate → Leo (shortest)', err:'LEO is shortest! Order: Mia → Kate → Leo' },
+    { e:'📅', q:'Today is Wednesday. What day will it be in 100 days?', sub:'Hint: there are 7 days in a week — think about the remainder', hint:'100 ÷ 7 = 14 remainder 2. Count 2 days forward from Wednesday…', type:'type', accept:['friday'],
+      ok:'🎯 Friday! 100 ÷ 7 leaves a remainder of 2 — count 2 days forward from Wednesday: Thursday, Friday!', err:'FRIDAY! 100 days is 14 full weeks plus 2 extra days — Wednesday +2 = Friday!' },
+    { e:'🏁', q:'A race: Zoe beat Max. Max beat Leo. Leo beat Priya. Priya beat Sam. Who came 3rd?', sub:'Work out the whole finishing order first', hint:'Order: Zoe, Max, Leo, Priya, Sam…', type:'pick4', opts:['Max','Leo','Priya','Sam'], c:1,
+      ok:'🎯 Leo! Full order: Zoe→Max→Leo→Priya→Sam, so Leo is 3rd!', err:'LEO came 3rd! Full order: Zoe, Max, Leo, Priya, Sam' },
+  ],
+},
+grammar: {
+  1: [
+    { e:'🐶', q:'Which word is the NOUN in this sentence?\n"The dog ran quickly."', sub:'A noun is a person, place, animal or thing', hint:'Which word names an animal?', type:'pick4', opts:['The','dog','ran','quickly'], c:1,
+      ok:'🎯 Dog! It\'s the noun — the animal in the sentence!', err:'DOG is the noun — it names the animal!' },
+    { e:'🎤', q:'Which word is the VERB in this sentence?\n"She sings beautifully."', sub:'A verb is a doing or being word', hint:'What is she DOING?', type:'pick4', opts:['She','sings','beautifully','.'], c:1,
+      ok:'🎯 Sings! It\'s the verb — the action word!', err:'SINGS is the verb — it\'s the action/doing word!' },
+    { e:'🦒', q:'Which word is the ADJECTIVE in this sentence?\n"The tall giraffe ate leaves."', sub:'An adjective describes a noun', hint:'Which word describes the giraffe?', type:'pick4', opts:['tall','giraffe','ate','leaves'], c:0,
+      ok:'🎯 Tall! It describes the giraffe — that\'s an adjective!', err:'TALL is the adjective — it describes what the giraffe is like!' },
+    { e:'❓', q:'What punctuation mark do we ALWAYS put at the end of a question?', sub:'Think about how a question sentence ends', hint:'It looks like a curly hook with a dot…', type:'type', accept:['question mark','?'],
+      ok:'🎯 A question mark (?)! Every question ends with one.', err:'A QUESTION MARK (?)! Every question sentence must end with one.' },
+  ],
+  2: [
+    { e:'🐢', q:'Which sentence uses a FRONTED ADVERBIAL correctly?', sub:'A fronted adverbial starts the sentence and is followed by a comma', hint:'Look for a comma right after the first word/phrase…', type:'pick4', opts:['Slowly, the tortoise crept forward.','The tortoise slowly crept, forward.','Forward the tortoise crept slowly','Tortoise the slowly crept forward'], c:0,
+      ok:'🎯 "Slowly, the tortoise crept forward." — the adverbial "Slowly" comes first, with a comma!', err:'"Slowly, the tortoise crept forward." — fronted adverbials go first, followed by a comma!' },
+    { e:'🐕', q:'Choose the correct way to show the toy BELONGS to the dog:', sub:'Think about apostrophes for possession', hint:'One dog owns it — apostrophe before the S', type:'pick4', opts:['dogs\' toy','dog\'s toy','dogs toy','doges toy'], c:1,
+      ok:'🎯 dog\'s toy! Apostrophe + s shows one dog owns the toy!', err:'DOG\'S TOY! For one owner, add apostrophe + s' },
+    { e:'☕', q:'Which word is the CONJUNCTION joining the two ideas?\n"I like tea but I prefer coffee."', sub:'A conjunction joins two clauses together', hint:'Which word means "however"?', type:'pick4', opts:['I','like','but','coffee'], c:2,
+      ok:'🎯 But! It joins the two ideas together — a conjunction!', err:'BUT is the conjunction — it joins the two parts of the sentence!' },
+    { e:'☔', q:'Which sentence is correctly punctuated?', sub:'Think about "it\'s" (it is) vs "its" (belonging to it)', hint:'"It is raining" — so we need the apostrophe version…', type:'pick4', opts:['Its raining outside.','It\'s raining outside.','Its\' raining outside.','Its raining, outside.'], c:1,
+      ok:'🎯 "It\'s raining outside." — it\'s = it is!', err:'"IT\'S raining outside." — it\'s (with apostrophe) means "it is"!' },
+  ],
+  3: [
+    { e:'🐕', q:'Which of these is an EXPANDED NOUN PHRASE?', sub:'It adds extra describing detail to a noun', hint:'Look for extra describing words before the noun…', type:'pick4', opts:['dog','the big fluffy dog','ran fast','quickly'], c:1,
+      ok:'🎯 "the big fluffy dog" — extra adjectives expand the noun phrase!', err:'"THE BIG FLUFFY DOG" — the adjectives "big" and "fluffy" expand the noun phrase!' },
+    { e:'🍇', q:'Which sentence correctly punctuates a list?', sub:'Commas separate list items, with "and" before the last one', hint:'Look for commas between each fruit…', type:'pick4', opts:['I bought apples pears and grapes.','I bought apples, pears, and grapes.','I bought, apples pears and grapes.','I bought apples pears, and grapes'], c:1,
+      ok:'🎯 "I bought apples, pears, and grapes." — commas separate each item in the list!', err:'"I bought apples, PEARS, and grapes." — use commas between every list item!' },
+    { e:'😊', q:'Which sentence uses STANDARD ENGLISH correctly?', sub:'Standard English follows formal grammar rules', hint:'"We ___ happy" — think about the correct form of "to be"…', type:'pick4', opts:['We was happy.','We were happy.','We is happy.','We be happy.'], c:1,
+      ok:'🎯 "We were happy." — the correct Standard English form!', err:'"We WERE happy." — this is the correct Standard English form!' },
+    { e:'🔗', q:'What do we call words like "and", "but", and "because" that join clauses together?', sub:'They connect ideas in a sentence', hint:'Starts with "con"…', type:'type', accept:['conjunctions','conjunction'],
+      ok:'🎯 Conjunctions! They join clauses and ideas together.', err:'CONJUNCTIONS — words that join clauses together, like "and", "but", "because"!' },
+  ],
+  4: [
+    { e:'🐕', q:'Which sentence contains a RELATIVE CLAUSE?', sub:'A relative clause gives extra info, often starting with "which", "who" or "that"', hint:'Look for a clause starting with "which"…', type:'pick4', opts:['The dog barked loudly.','The dog, which was hungry, barked loudly.','The dog barked, and ran.','Barking loudly, the dog ran.'], c:1,
+      ok:'🎯 "...which was hungry..." is the relative clause — extra info about the dog!', err:'"The dog, WHICH WAS HUNGRY, barked loudly." — that\'s the relative clause!' },
+    { e:'🇫🇷', q:'Which sentence correctly uses brackets for extra information?', sub:'Brackets (parenthesis) go around the extra detail', hint:'The extra info about Europe should be inside brackets…', type:'pick4', opts:['The capital of France (which is in Europe) is Paris.','The capital of France, which is in Europe is Paris.','The capital (of France which is in Europe) is Paris','The capital of France which, is in Europe, is Paris.'], c:0,
+      ok:'🎯 The brackets correctly wrap the extra information about Europe!', err:'"The capital of France (WHICH IS IN EUROPE) is Paris." — brackets wrap the extra info!' },
+    { e:'🏃', q:'What word class is "quickly" in the sentence "She ran quickly"?', sub:'It describes HOW she ran', hint:'Words describing verbs usually end in -ly…', type:'type', accept:['adverb'],
+      ok:'🎯 Adverb! It describes how the action (ran) was done.', err:'ADVERB — it describes how the verb "ran" was done!' },
+    { e:'💭', q:'Which sentence correctly uses the SUBJUNCTIVE mood?', sub:'Used for wishes or unreal situations — "If I were..."', hint:'"If I ___ rich" for something not true…', type:'pick4', opts:['If I was rich, I would travel.','If I were rich, I would travel.','If I am rich, I would travel.','If I will be rich, I would travel.'], c:1,
+      ok:'🎯 "If I WERE rich..." — the subjunctive form for unreal/wishful situations!', err:'"If I WERE rich..." — this is the correct subjunctive form!' },
+  ],
+  5: [
+    { e:'🏠', q:'Choose the correct homophone:\n"They\'re going to ___ house."', sub:'Think about which spelling shows possession', hint:'Belonging to them…', type:'pick4', opts:['there','their','they\'re','ther'], c:1,
+      ok:'🎯 Their! It shows the house belongs to them.', err:'THEIR — shows possession (belonging to them)!' },
+    { e:'📝', q:'Which sentence has a SPELLING error?', sub:'Read each one carefully', hint:'One word breaks the "i before e" rule wrongly…', type:'pick4', opts:['Definitely, I believe you.','I recieved the parcel today.','Necessary steps were taken.','Separate the eggs carefully.'], c:1,
+      ok:'🎯 "recieved" is wrong — it should be RECEIVED (i before e, except after c)!', err:'"I RECIEVED the parcel" has the error — it should be spelled RECEIVED!' },
+    { e:'👯', q:'What is the term for words that sound the SAME but have different spellings and meanings? (e.g. "to", "too", "two")', sub:'They confuse a lot of writers!', hint:'Homo- means "same", -phone means "sound"…', type:'type', accept:['homophone','homophones'],
+      ok:'🎯 Homophones! Same sound, different spelling and meaning.', err:'HOMOPHONES — words that sound the same but are spelled differently!' },
+    { e:'🤫', q:'Which sentence is grammatically correct?', sub:'Think about "I" vs "me" after prepositions like "between"', hint:'"Between you and ___" — try it with just one person: "This is between ___."', type:'pick4', opts:['Between you and I, this is a secret.','Between you and me, this is a secret.','Between you and myself, this is a secret.','Between I and you, this is a secret.'], c:1,
+      ok:'🎯 "Between you and ME" — after a preposition like "between", use "me" not "I"!', err:'"Between you and ME..." — "me" is correct after the preposition "between"!' },
+  ],
+},
+math: {
+  1: [
+    { e:'➕', q:'45 + 27 = ?', sub:'Simple addition', hint:'45 + 20 = 65, then + 7…', type:'type', accept:['72'], ok:'🎯 72! Great addition!', err:'72! 45 + 27 = 72' },
+    { e:'✖️', q:'9 × 6 = ?', sub:'Times tables', hint:'9×6 is the same as 6×9…', type:'type', accept:['54'], ok:'🎯 54! Nice times-table recall!', err:'54! 9 × 6 = 54' },
+    { e:'🔢', q:'Which number is BIGGER: 482 or 428?', sub:'Compare digit by digit', hint:'Look at the tens digit — 8 or 2?', type:'pick4', opts:['482','428','Equal','Can\'t tell'], c:0,
+      ok:'🎯 482! Its tens digit (8) is bigger than 428\'s tens digit (2).', err:'482 is bigger! Compare the tens digit: 8 > 2' },
+    { e:'➖', q:'100 − 37 = ?', sub:'Simple subtraction', hint:'100 − 40 = 60, then add 3 back…', type:'type', accept:['63'], ok:'🎯 63! 100 − 37 = 63', err:'63! 100 − 37 = 63' },
+  ],
+  2: [
+    { e:'➕', q:'3457 + 2186 = ?', sub:'4-digit addition — line up the columns!', hint:'Add ones, then tens, then hundreds, then thousands…', type:'type', accept:['5643'],
+      ok:'🎯 5643! Great 4-digit addition!', err:'5643! 3457 + 2186 = 5643' },
+    { e:'➖', q:'6042 − 2789 = ?', sub:'4-digit subtraction — watch the borrowing!', hint:'You\'ll need to borrow a few times…', type:'type', accept:['3253'],
+      ok:'🎯 3253! Well done with the borrowing!', err:'3253! 6042 − 2789 = 3253' },
+    { e:'✖️', q:'234 × 3 = ?', sub:'Multiply a 3-digit number by 1 digit', hint:'200×3=600, 30×3=90, 4×3=12…', type:'type', accept:['702'],
+      ok:'🎯 702! 234 × 3 = 702', err:'702! 234 × 3 = 702 (600+90+12)' },
+    { e:'📐', q:'What is the PERIMETER of a rectangle 5cm by 3cm?', sub:'Perimeter = add up all 4 sides', hint:'5+3+5+3=?', type:'pick4', opts:['8cm','16cm','15cm','10cm'], c:1,
+      ok:'🎯 16cm! 5+3+5+3 = 16cm', err:'16cm! Add all 4 sides: 5+3+5+3 = 16cm' },
+  ],
+  3: [
+    { e:'➗', q:'456 ÷ 6 = ?', sub:'Division of a 3-digit number', hint:'6 × 70 = 420, what\'s left over?', type:'type', accept:['76'],
+      ok:'🎯 76! 456 ÷ 6 = 76', err:'76! 456 ÷ 6 = 76 (check: 76×6=456)' },
+    { e:'🍕', q:'What is 3/4 of 20?', sub:'Find a quarter first, then multiply', hint:'20 ÷ 4 = 5, then × 3…', type:'type', accept:['15'],
+      ok:'🎯 15! 20÷4=5, then 5×3=15', err:'15! First find 1/4 (=5), then multiply by 3: 15' },
+    { e:'📐', q:'What is the AREA of a rectangle 6cm by 4cm?', sub:'Area = length × width', hint:'6 × 4 = ?', type:'pick4', opts:['10cm²','24cm²','20cm²','12cm²'], c:1,
+      ok:'🎯 24cm²! Area = 6 × 4 = 24cm²', err:'24cm²! Area = length × width = 6 × 4 = 24cm²' },
+    { e:'🎬', q:'A film starts at 14:20 and lasts 55 minutes. What time does it end?', sub:'Add 55 minutes to 14:20', hint:'14:20 + 40min = 15:00, then add 15 more…', type:'type', accept:['15:15','3:15','3:15pm','15:15pm'],
+      ok:'🎯 15:15! 14:20 + 55 minutes = 15:15', err:'15:15 (3:15pm)! 14:20 + 55 minutes = 15:15' },
+  ],
+  4: [
+    { e:'🍰', q:'1/2 + 1/4 = ? (Give your answer as a fraction, e.g. 3/4)', sub:'Make the denominators match first', hint:'1/2 is the same as 2/4…', type:'type', accept:['3/4'],
+      ok:'🎯 3/4! 1/2 (=2/4) + 1/4 = 3/4', err:'3/4! Turn 1/2 into 2/4, then add: 2/4+1/4=3/4' },
+    { e:'💯', q:'0.5 + 0.25 = ?', sub:'Line up the decimal points', hint:'Think of it as money: 50p + 25p…', type:'type', accept:['0.75','.75'],
+      ok:'🎯 0.75! Just like 50p + 25p = 75p', err:'0.75! 0.5 + 0.25 = 0.75' },
+    { e:'💰', q:'Pens cost £2.35 each. How much do 4 pens cost?', sub:'Multiply the price by 4', hint:'£2 × 4 = £8, then 35p × 4…', type:'type', accept:['9.40','£9.40','9.4','9.40£'],
+      ok:'🎯 £9.40! 2.35 × 4 = 9.40', err:'£9.40! 2.35 × 4 = 9.40' },
+    { e:'📊', q:'What is 15% of 200?', sub:'10% of 200 is easy — then add half of that', hint:'10% = 20, 5% = 10, add them…', type:'type', accept:['30'],
+      ok:'🎯 30! 10% of 200=20, 5%=10, 20+10=30', err:'30! 15% of 200 = 30 (10%=20, 5%=10, total 30)' },
+  ],
+  5: [
+    { e:'🔤', q:'If x + 8 = 20, what is x?', sub:'Subtract 8 from both sides', hint:'20 − 8 = ?', type:'type', accept:['12'],
+      ok:'🎯 x = 12! 20 − 8 = 12', err:'x = 12! 20 − 8 = 12' },
+    { e:'🔤', q:'If 3x = 27, what is x?', sub:'Divide both sides by 3', hint:'27 ÷ 3 = ?', type:'type', accept:['9'],
+      ok:'🎯 x = 9! 27 ÷ 3 = 9', err:'x = 9! 27 ÷ 3 = 9' },
+    { e:'📐', q:'A rectangle has an area of 48cm² and a width of 6cm. What is its LENGTH?', sub:'Area = length × width, so work backwards', hint:'48 ÷ 6 = ?', type:'type', accept:['8','8cm'],
+      ok:'🎯 8cm! 48 ÷ 6 = 8', err:'8cm! Since area = length × width, length = 48 ÷ 6 = 8cm' },
+    { e:'🔤', q:'If 2x + 5 = 19, what is x?', sub:'First take away 5, then divide by 2', hint:'19 − 5 = 14, then 14 ÷ 2…', type:'type', accept:['7'],
+      ok:'🎯 x = 7! 19−5=14, then 14÷2=7', err:'x = 7! First 19−5=14, then 14÷2=7' },
+  ],
+},
+science: {
+  1: [
+    { e:'🧊', q:'Which of these is a SOLID?', sub:'Solids keep their own shape', hint:'It\'s what water becomes in the freezer…', type:'pick4', opts:['Water','Ice','Steam','Air'], c:1,
+      ok:'🎯 Ice! It keeps its shape — that\'s a solid!', err:'ICE is the solid — it keeps its own shape!' },
+    { e:'🌱', q:'What do plants need to grow well?', sub:'Think about all the things a plant needs', hint:'More than just one thing…', type:'pick4', opts:['Only water','Water, sunlight and air','Only sunlight','Only soil'], c:1,
+      ok:'🎯 Water, sunlight and air! Plants need all three to grow!', err:'WATER, SUNLIGHT AND AIR — plants need all three together!' },
+    { e:'🐕', q:'Which animal is a MAMMAL?', sub:'Mammals have fur and feed milk to their babies', hint:'Which one has fur and isn\'t a fish or reptile?', type:'pick4', opts:['Dog','Frog','Fish','Snake'], c:0,
+      ok:'🎯 Dog! It has fur and feeds its babies milk — a mammal!', err:'DOG is the mammal — it has fur and feeds milk to its babies!' },
+    { e:'🌧️', q:'What do we call water falling from clouds?', sub:'It happens on a cloudy, wet day', hint:'Starts with R…', type:'type', accept:['rain'],
+      ok:'🎯 Rain! Water falling from clouds.', err:'RAIN — that\'s the water falling from clouds!' },
+  ],
+  2: [
+    { e:'💨', q:'What do we call the process when a LIQUID turns into a GAS?', sub:'It happens when water heats up', hint:'Think of a boiling kettle making steam…', type:'pick4', opts:['Freezing','Evaporation','Melting','Condensation'], c:1,
+      ok:'🎯 Evaporation! Liquid turns into gas when it heats up.', err:'EVAPORATION — liquid turning into gas, like a boiling kettle!' },
+    { e:'🔋', q:'In an electrical circuit, what does the BATTERY provide?', sub:'It\'s the energy source of the circuit', hint:'Without it, nothing would light up…', type:'pick4', opts:['Light','Power/energy','Sound','Water'], c:1,
+      ok:'🎯 Power/energy! The battery is the energy source for the circuit.', err:'POWER/ENERGY — the battery provides the energy for the circuit!' },
+    { e:'👂', q:'Sound travels to our ears through vibrations in the ___?', sub:'Think about what\'s all around us', hint:'We breathe it!', type:'type', accept:['air'],
+      ok:'🎯 Air! Sound travels as vibrations through the air.', err:'AIR — sound travels as vibrations through the air to reach our ears!' },
+    { e:'🦷', q:'Which teeth are used for TEARING meat?', sub:'They are pointy and sharp', hint:'Vampires are famous for these!', type:'pick4', opts:['Molars','Incisors','Canines','Wisdom teeth'], c:2,
+      ok:'🎯 Canines! Pointy teeth used for tearing food.', err:'CANINES — the pointy teeth used for tearing meat!' },
+  ],
+  3: [
+    { e:'☁️', q:'In the water cycle, which of these happens FIRST?', sub:'Think about where the water starts', hint:'Water needs to go UP into the sky before it can fall…', type:'pick4', opts:['Precipitation','Evaporation','Condensation','None'], c:1,
+      ok:'🎯 Evaporation! Water rises up first, then condenses, then falls as precipitation.', err:'EVAPORATION happens first — water rises up, then condenses, then falls!' },
+    { e:'⚡', q:'What is the name for a material that lets electricity pass through it easily?', sub:'Metals are usually good at this', hint:'Starts with "con"…', type:'type', accept:['conductor'],
+      ok:'🎯 Conductor! Metals like copper are good conductors.', err:'CONDUCTOR — a material that lets electricity flow through easily!' },
+    { e:'🫃', q:'Which part of the digestive system breaks down food using ACID?', sub:'It\'s in your tummy', hint:'It rhymes with "tomorrow" almost…', type:'pick4', opts:['Mouth','Stomach','Small intestine','Large intestine'], c:1,
+      ok:'🎯 Stomach! It uses acid to help break down food.', err:'STOMACH — it uses strong acid to break down food!' },
+    { e:'🔊', q:'What happens to sound as you move FURTHER from its source?', sub:'Think about a fading noise', hint:'It doesn\'t get louder…', type:'pick4', opts:['Gets louder','Gets quieter','Stays the same','Disappears instantly'], c:1,
+      ok:'🎯 Gets quieter! Sound fades the further away you are.', err:'It GETS QUIETER the further away you move from the sound!' },
+  ],
+  4: [
+    { e:'🍎', q:'What force pulls objects down towards the Earth?', sub:'It\'s why things fall when you drop them', hint:'Sir Isaac Newton studied this with a falling apple…', type:'pick4', opts:['Friction','Gravity','Magnetism','Air resistance'], c:1,
+      ok:'🎯 Gravity! It pulls everything down towards the Earth.', err:'GRAVITY — the force pulling objects down towards Earth!' },
+    { e:'🐄', q:'What is the name for an animal that ONLY eats plants?', sub:'Cows and rabbits are examples', hint:'Herb means "plant" in Latin…', type:'type', accept:['herbivore'],
+      ok:'🎯 Herbivore! An animal that only eats plants.', err:'HERBIVORE — herb (plant) + vore (eater)!' },
+    { e:'🧤', q:'Which of these is an INSULATOR (does NOT conduct electricity well)?', sub:'Insulators are often used to cover wires safely', hint:'Rubber gloves keep electricians safe…', type:'pick4', opts:['Copper','Rubber','Iron','Silver'], c:1,
+      ok:'🎯 Rubber! It\'s an insulator — electricity can\'t easily pass through it.', err:'RUBBER — an insulator that does NOT conduct electricity well!' },
+    { e:'🌿', q:'What is the main gas that plants take in to make their food (photosynthesis)?', sub:'It\'s a gas we breathe OUT', hint:'Not oxygen — the other one…', type:'pick4', opts:['Oxygen','Carbon dioxide','Nitrogen','Hydrogen'], c:1,
+      ok:'🎯 Carbon dioxide! Plants take it in to make food using sunlight.', err:'CARBON DIOXIDE — plants use it to make food through photosynthesis!' },
+  ],
+  5: [
+    { e:'☀️', q:'What is the process called where plants make their own food using sunlight?', sub:'Photo means "light"', hint:'Photo + synthesis…', type:'type', accept:['photosynthesis'],
+      ok:'🎯 Photosynthesis! Plants use sunlight, water and CO2 to make food.', err:'PHOTOSYNTHESIS — how plants make food using sunlight!' },
+    { e:'🧊', q:'What is the freezing point of water in Celsius?', sub:'A very well-known number in science', hint:'Think of ice forming…', type:'pick4', opts:['0°C','100°C','50°C','-10°C'], c:0,
+      ok:'🎯 0°C! Water freezes into ice at exactly 0 degrees Celsius.', err:'0°C — water freezes at exactly zero degrees Celsius!' },
+    { e:'❤️', q:'Which organ pumps blood around the body?', sub:'You can feel it beating in your chest', hint:'It\'s often drawn as a symbol for love!', type:'pick4', opts:['Lungs','Heart','Liver','Kidneys'], c:1,
+      ok:'🎯 Heart! It pumps blood all around your body.', err:'HEART — it pumps blood all around your body!' },
+    { e:'🛹', q:'What do we call the force that slows down moving objects when surfaces rub together?', sub:'It\'s why a ball eventually stops rolling', hint:'Rub your hands together fast — you feel this!', type:'type', accept:['friction'],
+      ok:'🎯 Friction! It slows things down when surfaces rub together.', err:'FRICTION — the force that slows objects down when surfaces rub together!' },
+  ],
+},
+};
+
+const subjectMeta = {
+  reasoning: {name:'🧩 Reasoning', color:'#c77dff', emoji:'🧩'},
+  grammar:   {name:'✏️ Grammar',   color:'#ff6b35', emoji:'✏️'},
+  math:      {name:'➕ Maths',     color:'#7bed9f', emoji:'➕'},
+  science:   {name:'🔬 Science',   color:'#90e0ef', emoji:'🔬'},
+};
+const levelMeta = {
+  1: {label:'Warm-Up', short:'🌱 L1'},
+  2: {label:'Year 4',  short:'📘 Y4'},
+  3: {label:'Year 4+', short:'🔥 Y4+'},
+  4: {label:'Year 5/6',short:'🚀 Y5/6'},
+  5: {label:'Champion',short:'🏆 Champ'},
+};
+const SESSION_LEN = 20;
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let lastMode='reasoning';
+let mode='reasoning';           // reasoning | grammar | math | science | mixed
+let level=2;                    // 1-5
+let levelStreak=0, levelWrong=0;
+let qIdx=0, score=0, streak=0, bestStreak=0, answered=false, hintShown=false;
+let curQ=null, curSubject=null, curLevelAtQ=2;
+let levelHistory=[];            // track levels reached, for results summary
+let subjectCounts={};           // for mixed mode summary
+let deck={};                    // shuffled queues per "subject-level" key
+
+function normalizeAns(s){
+  return String(s).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s.]/g,'')
+    .replace(/\b(the|a|an|river|mount|mt|lake|ocean|sea)\b/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function fuzzyMatch(val,accept){
+  const nv=normalizeAns(val);
+  return accept.some(a=>{
+    const na=normalizeAns(a);
+    if(nv===na) return true;
+    const numeric = /^[0-9.,]+$/.test(na) || /^[0-9.,]+$/.test(nv);
+    if(numeric) return false;
+    return (nv.length>2 && na.includes(nv)) || (na.length>2 && nv.includes(na));
+  });
+}
+
+function shuffleArr(a){
+  const arr=a.slice();
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+function deckKey(subj,lvl){ return subj+'-'+lvl; }
+function drawQuestion(subj,lvl){
+  const key=deckKey(subj,lvl);
+  if(!deck[key] || deck[key].length===0){
+    deck[key]=shuffleArr(bank[subj][lvl].map((q,i)=>i));
+  }
+  const idx=deck[key].pop();
+  return {subject:subj, level:lvl, data:bank[subj][lvl][idx]};
+}
+function pickNext(){
+  let subj;
+  if(mode==='mixed'){
+    const subs=Object.keys(subjectMeta);
+    subj=subs[Math.floor(Math.random()*subs.length)];
+  } else {
+    subj=mode;
+  }
+  return drawQuestion(subj,level);
+}
+
+// floaters
+const flIcons=['🧩','✏️','➕','🔬','🏆','⭐','🧠','📐','🔢','🔤','⚡','🌱'];
+const flEl=document.getElementById('floaters');
+for(let i=0;i<16;i++){const s=document.createElement('span');s.textContent=flIcons[Math.floor(Math.random()*flIcons.length)];s.style.left=(Math.random()*100)+'%';s.style.fontSize=(.9+Math.random()*1.3)+'rem';s.style.animationDuration=(9+Math.random()*13)+'s';s.style.animationDelay=(Math.random()*10)+'s';flEl.appendChild(s);}
+
+function goHome(){
+  document.getElementById('homeScreen').style.display='block';
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startSession(m){
+  lastMode=m; mode=m;
+  level=2; levelStreak=0; levelWrong=0;
+  qIdx=0; score=0; streak=0; bestStreak=0; answered=false; hintShown=false;
+  levelHistory=[level]; subjectCounts={};
+  deck={};
+  document.getElementById('homeScreen').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('quizScreen').style.display='block';
+  document.getElementById('qhScore').textContent='0';
+  document.getElementById('qhStreak').textContent='0🔥';
+  renderQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQ(){
+  answered=false; hintShown=false;
+  const picked=pickNext();
+  curQ=picked.data; curSubject=picked.subject; curLevelAtQ=picked.level;
+  subjectCounts[curSubject]=(subjectCounts[curSubject]||0)+1;
+
+  document.getElementById('qhNum').textContent=`${qIdx+1}/${SESSION_LEN}`;
+  document.getElementById('progFill').style.width=((qIdx/SESSION_LEN)*100)+'%';
+  document.getElementById('qhLevel').textContent=levelMeta[level].short;
+  document.getElementById('qTypePill').textContent=curQ.type==='type'?'⌨️ TYPE IT':'🖱️ CHOOSE';
+  document.getElementById('qEmoji').textContent=curQ.e;
+  document.getElementById('qText').textContent=curQ.q;
+  document.getElementById('qSub').textContent=curQ.sub||'';
+
+  const meta=subjectMeta[curSubject];
+  const tag=document.getElementById('qTag');
+  tag.textContent=meta.name; tag.style.color=meta.color; tag.style.borderColor=meta.color+'55'; tag.style.background=meta.color+'12';
+
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  const hb=document.getElementById('hintBox'); hb.className='hint-box'; hb.textContent='💡 Tap for a hint';
+
+  const aa=document.getElementById('answerArea'); aa.innerHTML='';
+  if(curQ.type==='type'){
+    aa.innerHTML=`<div class="type-wrap">
+      <input class="type-input" id="typeIn" placeholder="Type your answer…" autocomplete="off" spellcheck="false"/>
+      <button class="submit-btn" id="subBtn" onclick="submitType()">✅ Check Answer</button>
+    </div>`;
+    const inp=document.getElementById('typeIn');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitType();});
+    setTimeout(()=>inp.focus(),100);
+  } else {
+    const grid=document.createElement('div');
+    grid.className=curQ.opts.length>4?'opts-6':'opts-4';
+    curQ.opts.forEach((opt,i)=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt;
+      btn.onclick=()=>pickOpt(i,btn); grid.appendChild(btn);
+    });
+    aa.appendChild(grid);
+  }
+  const card=document.getElementById('qCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+}
+
+function showHint(){
+  if(hintShown||answered)return;
+  hintShown=true;
+  const hb=document.getElementById('hintBox');
+  hb.className='hint-box shown'; hb.textContent='💡 Hint: '+curQ.hint;
+}
+
+function submitType(){
+  if(answered)return;
+  const inp=document.getElementById('typeIn'), val=inp.value.trim();
+  if(!val){inp.focus();return;}
+  const correct=fuzzyMatch(val,curQ.accept);
+  inp.disabled=true; document.getElementById('subBtn').disabled=true;
+  inp.className='type-input '+(correct?'ok-in':'err-in');
+  processAns(correct);
+}
+
+function pickOpt(chosen,btn){
+  if(answered)return;
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const correct=chosen===curQ.c;
+  if(correct) btn.classList.add('correct');
+  else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[curQ.c].classList.add('correct'); }
+  processAns(correct);
+}
+
+function processAns(correct){
+  answered=true;
+  const fb=document.getElementById('fb'); fb.style.display='block';
+  let levelChangeMsg='';
+
+  if(correct){
+    const pts=10+(streak>=2?5:0)+(!hintShown?3:0);
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak;
+    levelStreak++; levelWrong=0;
+    document.getElementById('qhScore').textContent=score;
+    document.getElementById('qhStreak').textContent=streak+'🔥';
+    if(levelStreak>=3 && level<5){
+      level++; levelStreak=0; levelHistory.push(level);
+      levelChangeMsg=`<span class="lvltag">⬆️ LEVEL UP! Now at ${levelMeta[level].label}!</span>`;
+    }
+    fb.className='fb ok';
+    fb.innerHTML=curQ.ok+(streak>=3?` 🔥 ${streak} in a row!`:'')+(!hintShown?' ⭐ No-hint bonus!':'')+levelChangeMsg;
+  } else {
+    streak=0; levelWrong++; levelStreak=0;
+    document.getElementById('qhStreak').textContent='0🔥';
+    if(levelWrong>=2 && level>1){
+      level--; levelWrong=0; levelHistory.push(level);
+      levelChangeMsg=`<span class="lvltag">↩️ Easing back to ${levelMeta[level].label} — you\'ve got this!</span>`;
+    }
+    fb.className='fb err';
+    fb.innerHTML=curQ.err+levelChangeMsg;
+  }
+  document.getElementById('qhLevel').textContent=levelMeta[level].short;
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=SESSION_LEN) showResults();
+  else renderQ();
+}
+
+function showResults(){
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('progFill').style.width='100%';
+
+  const rawPct = score / (SESSION_LEN * 10);
+  const peakLevel = Math.max(...levelHistory);
+
+  let trophy,title,sub;
+  if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — incredible! 👑`;}
+  else if(rawPct>=.8){trophy='🥇';title='Outstanding, David!';sub=`${score} points! You reached ${levelMeta[peakLevel].label} level — amazing work! 🔥`;}
+  else if(rawPct>=.6){trophy='🥈';title='Brilliant work, David!';sub=`${score} points! Really solid session — keep it up! 💪`;}
+  else if(rawPct>=.4){trophy='🎯';title='Good effort, David!';sub=`${score} points! Every session makes you sharper — try again! 🚀`;}
+  else               {trophy='🌱';title='Nice try, David!';sub=`${score} points! That\'s okay — the arena adjusts to help you improve. Go again! 💪`;}
+
+  document.getElementById('rTrophy').textContent=trophy;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rStars').textContent=rawPct>=1?'⭐⭐⭐⭐⭐':rawPct>=.8?'⭐⭐⭐⭐':rawPct>=.6?'⭐⭐⭐':rawPct>=.4?'⭐⭐':'⭐';
+
+  const fl2=document.getElementById('flList'); fl2.innerHTML='';
+  const rowScore=document.createElement('div'); rowScore.className='fl-row';
+  rowScore.innerHTML=`<span>⭐ Final Score</span><span class="flv">${score} pts</span>`; fl2.appendChild(rowScore);
+  const rowStreak=document.createElement('div'); rowStreak.className='fl-row';
+  rowStreak.innerHTML=`<span>🔥 Best Streak</span><span class="flv">${bestStreak} in a row</span>`; fl2.appendChild(rowStreak);
+  const rowPeak=document.createElement('div'); rowPeak.className='fl-row';
+  rowPeak.innerHTML=`<span>🏔️ Highest Level Reached</span><span class="flv">${levelMeta[peakLevel].label}</span>`; fl2.appendChild(rowPeak);
+  if(mode==='mixed'){
+    Object.keys(subjectCounts).forEach(s=>{
+      const row=document.createElement('div'); row.className='fl-row';
+      row.innerHTML=`<span>${subjectMeta[s].name}</span><span class="flv">${subjectCounts[s]} questions</span>`; fl2.appendChild(row);
+    });
+  } else {
+    const row=document.createElement('div'); row.className='fl-row';
+    row.innerHTML=`<span>📚 Subject</span><span class="flv">${subjectMeta[mode].name}</span>`; fl2.appendChild(row);
+  }
+
+  const ml=document.getElementById('rMl');
+  if(rawPct>=.7){
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Fantastic session, David! Your brain is getting sharper every time! 🧠👑</p>
+      <p class="ro">🇷🇴 Sesiune fantastică, David! Mintea ta devine mai ascuțită de fiecare dată! 🌟</p>
+      <p class="es">🇪🇸 ¡Sesión fantástica, David! ¡Tu mente se agudiza cada vez más! 🏆</p>`;
+  } else {
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Good effort, David! Every try makes you stronger — go again whenever you\'re ready! 💪</p>
+      <p class="ro">🇷🇴 Efort bun, David! Fiecare încercare te face mai puternic — încearcă din nou! 📚</p>
+      <p class="es">🇪🇸 ¡Buen esfuerzo, David! ¡Cada intento te hace más fuerte! 🔄</p>`;
+  }
+  if(rawPct>=.6) launchConfetti();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function launchConfetti(){
+  const cols=['#ffc107','#7bed9f','#ff6b35','#f72585','#90e0ef','#c77dff','#e8d5b0'];
+  for(let i=0;i<90;i++){setTimeout(()=>{const c=document.createElement('div');c.className='cp';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(1.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);},i*20);}
+}
+</script>
+</body>
+</html>
