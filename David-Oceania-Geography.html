@@ -591,12 +591,29 @@ function showHint(){
   hb.className='hint-box shown'; hb.textContent='💡 Hint: '+questions[qIdx].hint;
 }
 
+function normalizeAns(s){
+  return String(s).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s.]/g,'')
+    .replace(/\b(the|a|an|river|mount|mt|lake|ocean|sea)\b/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function fuzzyMatch(val,accept){
+  const nv=normalizeAns(val);
+  return accept.some(a=>{
+    const na=normalizeAns(a);
+    if(nv===na) return true;
+    const numeric = /^[0-9.,]+$/.test(na) || /^[0-9.,]+$/.test(nv);
+    if(numeric) return false;
+    return (nv.length>2 && na.includes(nv)) || (na.length>2 && nv.includes(na));
+  });
+}
 function submitType(){
   if(answered)return;
-  const inp=document.getElementById('typeIn'), val=inp.value.trim().toLowerCase();
+  const inp=document.getElementById('typeIn'), val=inp.value.trim();
   if(!val){inp.focus();return;}
   const q=questions[qIdx];
-  const correct=q.accept.some(a=>val===a.toLowerCase());
+  const correct=fuzzyMatch(val,q.accept);
   inp.disabled=true; document.getElementById('subBtn').disabled=true;
   inp.className='type-input '+(correct?'ok-in':'err-in');
   processAns(correct,q);
