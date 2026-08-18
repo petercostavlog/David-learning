@@ -443,6 +443,17 @@ const SESSION_LEN = 20;
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
+const APP_ID='arena', APP_LABEL='Practice Arena';
+function recordSession(score,maxScore,extra){
+  try{
+    const key='david-stats-v1';
+    const rec={app:APP_ID,appLabel:APP_LABEL,date:new Date().toISOString(),score,maxScore,pct:maxScore?score/maxScore:0,extra:extra||{}};
+    const existing=JSON.parse(localStorage.getItem(key)||'[]');
+    existing.push(rec);
+    if(existing.length>300) existing.splice(0,existing.length-300);
+    localStorage.setItem(key,JSON.stringify(existing));
+  }catch(e){}
+}
 let lastMode='reasoning';
 let mode='reasoning';           // reasoning | grammar | math | science | mixed
 let level=2;                    // 1-5
@@ -637,6 +648,7 @@ function showResults(){
 
   const rawPct = score / (SESSION_LEN * 10);
   const peakLevel = Math.max(...levelHistory);
+  recordSession(score, SESSION_LEN*10, {mode:mode, peakLevelLabel:levelMeta[peakLevel].label});
 
   let trophy,title,sub;
   if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — incredible! 👑`;}

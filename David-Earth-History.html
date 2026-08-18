@@ -491,6 +491,17 @@ const questions = [
     err:'GEOLOGY — geo (Earth) + logy (study of). Could be YOUR future career, David! 🌍🔬' },
 ];
 
+const APP_ID='earth', APP_LABEL="Earth's History";
+function recordSession(score,maxScore,extra){
+  try{
+    const key='david-stats-v1';
+    const rec={app:APP_ID,appLabel:APP_LABEL,date:new Date().toISOString(),score,maxScore,pct:maxScore?score/maxScore:0,extra:extra||{}};
+    const existing=JSON.parse(localStorage.getItem(key)||'[]');
+    existing.push(rec);
+    if(existing.length>300) existing.splice(0,existing.length-300);
+    localStorage.setItem(key,JSON.stringify(existing));
+  }catch(e){}
+}
 let chIdx=0, seenChs=new Set([0]);
 let qIdx=0, score=0, streak=0, bestStreak=0, answered=false, hintShown=false;
 
@@ -668,6 +679,7 @@ function showResults(){
   document.getElementById('progFill').style.width='100%';
 
   const rawPct = score / (questions.length * 10);
+  recordSession(score, questions.length*10, {});
 
   let trophy,title,sub;
   if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — you ARE an Earth History champion! 🌍👑`;}
