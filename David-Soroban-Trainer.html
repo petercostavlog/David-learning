@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Soroban Flash Trainer 🧮</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060e06; --green:#52b788; --lime:#7bed9f; --amber:#ffc107;
+    --fire:#ff6b35; --bone:#e8d5b0; --red:#f72585; --sky:#90e0ef;
+    --purple:#c77dff; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse at 15% 20%,rgba(255,193,7,.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(82,183,136,.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#060e06 0%,#020802 100%);}
+
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:20px 14px 70px;}
+
+  .hdr{text-align:center;margin-bottom:18px;}
+  .hdr-badge{display:inline-block;background:rgba(255,193,7,.1);border:1.5px solid rgba(255,193,7,.3);border-radius:50px;padding:5px 16px;font-size:.78rem;font-weight:800;color:var(--amber);letter-spacing:.5px;margin-bottom:8px;}
+  .hdr h1{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,6vw,2.8rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800,0 0 30px rgba(255,193,7,.2);}
+  .hdr p{color:rgba(255,255,255,.4);font-weight:700;font-size:.86rem;margin-top:5px;}
+  .back-link{display:inline-block;margin-bottom:12px;color:rgba(255,255,255,.4);font-weight:800;font-size:.82rem;text-decoration:none;}
+  .back-link:hover{color:var(--amber);}
+
+  /* SETTINGS */
+  .set-card{border-radius:22px;padding:20px 20px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);margin-bottom:14px;}
+  .set-title{font-family:'Boogaloo',cursive;font-size:1.15rem;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .set-row{margin-bottom:16px;}
+  .set-row:last-child{margin-bottom:0;}
+  .set-label{font-size:.82rem;font-weight:800;color:rgba(255,255,255,.7);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+  .set-label .val{color:var(--lime);font-family:'Boogaloo',cursive;font-size:1rem;}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{padding:9px 16px;border-radius:50px;border:2px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-weight:800;font-size:.82rem;cursor:pointer;transition:all .18s;user-select:none;}
+  .chip.on{background:rgba(123,237,159,.15);border-color:var(--lime);color:var(--lime);}
+  .chip:hover{border-color:rgba(123,237,159,.4);}
+  input[type=range]{width:100%;accent-color:var(--amber);height:6px;}
+  select{width:100%;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:2px solid var(--border);color:white;font-weight:700;font-size:.85rem;font-family:'Nunito',sans-serif;}
+  .hint-line{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:6px;line-height:1.5;}
+
+  .start-btn{display:block;width:100%;margin-top:6px;padding:16px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.3rem;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 20px rgba(255,193,7,.35);}
+  .start-btn:hover{transform:translateY(-2px);}
+
+  /* PLAY SCREEN */
+  #playScreen{display:none;text-align:center;}
+  .play-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:.78rem;color:rgba(255,255,255,.4);font-weight:800;}
+  .play-hud .zoomctl{display:flex;align-items:center;gap:6px;}
+  .play-hud .zoomctl button{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:rgba(255,255,255,.06);color:white;cursor:pointer;font-weight:900;}
+
+  .stage{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border:2px solid var(--border);border-radius:26px;padding:20px;margin-bottom:16px;}
+  .countdown-num{font-family:'Boogaloo',cursive;color:var(--amber);text-shadow:2px 2px 0 #5a3800;font-size:5rem;animation:pop2 .8s ease;}
+  @keyframes pop2{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+  .flash-sign{font-family:'Boogaloo',cursive;color:var(--sky);font-size:2rem;margin-bottom:6px;}
+  .flash-digit{font-family:'Boogaloo',cursive;color:white;text-shadow:0 0 30px rgba(255,193,7,.3);line-height:1;}
+  .flash-progress{font-size:.75rem;color:rgba(255,255,255,.3);font-weight:800;margin-top:14px;}
+
+  .sb-number{display:inline-flex;gap:6px;background:#3a2410;padding:14px 12px;border-radius:12px;}
+  .sb-col{display:flex;flex-direction:column;align-items:center;}
+  .sb-heaven{display:flex;flex-direction:column;position:relative;}
+  .sb-heaven.active{justify-content:flex-end;}
+  .sb-heaven.inactive{justify-content:flex-start;}
+  .sb-bar{width:100%;background:#e8d5b0;margin:2px 0;border-radius:2px;}
+  .sb-earth{display:flex;flex-direction:column;}
+  .sb-bead{border-radius:50%;margin:1.5px auto;flex-shrink:0;}
+  .sb-bead.heaven-bead{background:radial-gradient(circle at 35% 30%,#ffe08a,#d4a017);}
+  .sb-bead.earth-bead-active{background:radial-gradient(circle at 35% 30%,#8fe3b0,#3fa86a);}
+  .sb-bead.earth-bead-inactive{background:radial-gradient(circle at 35% 30%,#5a6a5f,#2e3830);opacity:.5;}
+
+  .waiting-dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.15);animation:blink 1s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:.2}50%{opacity:.7}}
+
+  .answer-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .answer-input{width:100%;max-width:320px;padding:16px 18px;background:rgba(255,255,255,.07);border:2.5px solid rgba(255,255,255,.18);border-radius:16px;font-family:'Boogaloo',cursive;font-size:1.8rem;color:white;text-align:center;outline:none;transition:all .2s;}
+  .answer-input:focus{border-color:rgba(255,193,7,.6);box-shadow:0 0 20px rgba(255,193,7,.15);}
+  .answer-input.ok-in{border-color:var(--lime);background:rgba(123,237,159,.08);}
+  .answer-input.err-in{border-color:var(--red);background:rgba(247,37,133,.07);}
+  .submit-btn{padding:13px 34px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+
+  .fb{border-radius:16px;padding:16px 18px;margin-top:14px;font-weight:700;font-size:.9rem;line-height:1.6;display:none;text-align:left;}
+  .fb.ok{background:rgba(123,237,159,.1);border:1.5px solid var(--lime);color:#b7f5c8;}
+  .fb.err{background:rgba(247,37,133,.08);border:1.5px solid var(--red);color:#ffaacc;}
+  .fb .fb-title{font-family:'Boogaloo',cursive;font-size:1.1rem;margin-bottom:8px;display:block;}
+  .replay-row{display:flex;gap:8px;flex-wrap:wrap;font-size:.78rem;color:rgba(255,255,255,.65);font-weight:700;margin-top:8px;}
+  .replay-chip{background:rgba(255,255,255,.06);border-radius:8px;padding:4px 9px;}
+
+  .next-btn{display:none;width:100%;margin-top:14px;padding:14px;border:none;border-radius:50px;cursor:pointer;font-family:'Boogaloo',cursive;font-size:1.15rem;color:#060e06;background:linear-gradient(135deg,var(--amber),var(--fire));box-shadow:0 4px 16px rgba(255,193,7,.3);}
+
+  .q-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .qhb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:9px 6px;text-align:center;}
+  .qhb .qhv{font-family:'Boogaloo',cursive;font-size:1.25rem;color:white;display:block;}
+  .qhb .qhl{font-size:.6rem;color:rgba(255,255,255,.35);font-weight:800;text-transform:uppercase;}
+  .prog-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .4s ease;}
+
+  .quit-link{display:block;text-align:center;margin-top:10px;font-size:.76rem;color:rgba(255,255,255,.3);font-weight:700;cursor:pointer;text-decoration:underline;}
+
+  /* RESULTS */
+  #resultsSection{display:none;text-align:center;}
+  .r-trophy{font-size:5.2rem;display:block;margin-bottom:10px;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .r-title{font-family:'Boogaloo',cursive;font-size:clamp(1.7rem,5vw,2.6rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800;margin-bottom:6px;}
+  .r-sub{color:rgba(255,255,255,.5);font-weight:700;font-size:.92rem;margin-bottom:16px;}
+  .r-stars{font-size:1.9rem;letter-spacing:6px;margin-bottom:16px;}
+  .facts-learned{background:var(--card);border:1.5px solid rgba(255,193,7,.2);border-radius:18px;padding:16px;margin-bottom:16px;text-align:left;}
+  .facts-learned h3{font-family:'Boogaloo',cursive;color:var(--amber);font-size:1rem;margin-bottom:10px;}
+  .fl-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:.83rem;color:rgba(255,255,255,.8);font-weight:700;}
+  .fl-row .flv{color:var(--lime);font-family:'Boogaloo',cursive;font-size:1rem;}
+  .ml-box{background:rgba(255,255,255,.03);border:1.5px solid rgba(144,224,239,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.83rem;text-align:left;}
+  .ml-box p{margin-bottom:5px;line-height:1.55;}
+  .ml-box .en{color:var(--amber);font-weight:800;}
+  .ml-box .ro{color:var(--lime);font-weight:800;}
+  .ml-box .es{color:var(--sky);font-weight:800;}
+  .r-btns{display:flex;gap:10px;}
+  .r-btn{flex:1;padding:14px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;color:#060e06;}
+  .r-btn-learn{background:rgba(255,255,255,.08);color:white;border:2px solid var(--border);}
+  .r-btn-quiz{background:linear-gradient(135deg,var(--lime),var(--green));box-shadow:0 4px 16px rgba(123,237,159,.3);}
+
+  .cp{position:fixed;width:9px;height:9px;top:-9px;border-radius:2px;animation:cf linear forwards;z-index:999;pointer-events:none;}
+  @keyframes cf{to{transform:translateY(106vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="index.html">⬅️ Back to Learning Hub</a>
+  <div class="hdr">
+    <div class="hdr-badge">🧮 SOROBAN · FLASH ANZAN TRAINER</div>
+    <h1>David's Soroban Trainer! ⚡</h1>
+    <p>Watch the numbers, add them in your head, type the total!</p>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="settingsScreen">
+    <div class="set-card">
+      <div class="set-title">🔢 Numbers</div>
+      <div class="set-row">
+        <div class="set-label">How many digits? (pick one or more to mix)</div>
+        <div class="chip-row" id="digitChips">
+          <div class="chip on" data-len="1">1 digit</div>
+          <div class="chip" data-len="2">2 digits</div>
+          <div class="chip" data-len="3">3 digits</div>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-label">Operation (pick one or both to mix)</div>
+        <div class="chip-row" id="opChips">
+          <div class="chip on" data-op="add">➕ Addition</div>
+          <div class="chip" data-op="sub">➖ Subtraction</div>
+        </div>
+        <div class="hint-line">Subtraction never goes below zero — just like a real soroban!</div>
+      </div>
+      <div class="set-row">
+        <div class="set-label">Bead technique needed <span style="font-weight:700;color:rgba(255,255,255,.35)">(bonus — since David knows the beads!)</span></div>
+        <select id="complementSel">
+          <option value="all">Mixt (any)</option>
+          <option value="simple">Simple only (no complements)</option>
+          <option value="five">Needs "friends of 5"</option>
+          <option value="ten">Needs "friends of 10" (carrying)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="set-card">
+      <div class="set-title">👁️ Display</div>
+      <div class="set-row">
+        <div class="set-label">What to show</div>
+        <div class="chip-row" id="displayChips">
+          <div class="chip on" data-disp="digit">🔢 Digits only</div>
+          <div class="chip" data-disp="soroban">🧮 Soroban only</div>
+          <div class="chip" data-disp="both">✨ Both</div>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-label">Zoom / size <span class="val" id="zoomVal">100%</span></div>
+        <input type="range" id="zoomSlider" min="50" max="250" value="100" step="10">
+        <div class="hint-line">Sitting further from the screen? Turn this up!</div>
+      </div>
+    </div>
+
+    <div class="set-card">
+      <div class="set-title">⏱️ Speed</div>
+      <div class="set-row">
+        <div class="set-label">Flash time — how long each number shows <span class="val" id="flashVal">800ms</span></div>
+        <input type="range" id="flashSlider" min="200" max="3000" value="800" step="100">
+      </div>
+      <div class="set-row">
+        <div class="set-label">Gap time — pause between numbers <span class="val" id="gapVal">300ms</span></div>
+        <input type="range" id="gapSlider" min="0" max="2000" value="300" step="100">
+      </div>
+      <div class="set-row">
+        <div class="set-label">Numbers per round <span class="val" id="termVal">5</span></div>
+        <input type="range" id="termSlider" min="2" max="12" value="5" step="1">
+      </div>
+      <div class="set-row">
+        <div class="set-label">Rounds this session <span class="val" id="roundVal">10</span></div>
+        <input type="range" id="roundSlider" min="3" max="20" value="10" step="1">
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startSession()">⚡ Start Training!</button>
+  </div>
+
+  <!-- PLAY -->
+  <div id="playScreen">
+    <div class="q-hud">
+      <div class="qhb"><span class="qhv" id="qhScore">0</span><span class="qhl">⭐ Score</span></div>
+      <div class="qhb"><span class="qhv" id="qhStreak">0🔥</span><span class="qhl">Streak</span></div>
+      <div class="qhb"><span class="qhv" id="qhNum">1/10</span><span class="qhl">Round</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+    <div class="play-hud">
+      <span id="phaseLabel">Get ready…</span>
+      <span class="zoomctl">🔍 <button onclick="adjustZoom(-10)">−</button><span id="zoomLive">100%</span><button onclick="adjustZoom(10)">+</button></span>
+    </div>
+
+    <div class="stage" id="stage"></div>
+
+    <div id="answerArea" style="display:none;">
+      <div class="answer-wrap">
+        <input class="answer-input" id="answerIn" inputmode="numeric" placeholder="Total?" autocomplete="off"/>
+        <button class="submit-btn" id="subBtn" onclick="submitAnswer()">✅ Check</button>
+      </div>
+      <div class="fb" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextRound()">Next Round ➡️</button>
+    </div>
+
+    <div class="quit-link" onclick="goSettings()">⬅️ Back to settings</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsSection">
+    <span class="r-trophy" id="rTrophy">🏆</span>
+    <div class="r-title" id="rTitle">Amazing, David!</div>
+    <div class="r-sub" id="rSub"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="facts-learned">
+      <h3>📊 Session Summary</h3>
+      <div id="flList"></div>
+    </div>
+    <div class="ml-box" id="rMl"></div>
+    <div class="r-btns">
+      <button class="r-btn r-btn-learn" onclick="goSettings()">⚙️ Change Settings</button>
+      <button class="r-btn r-btn-quiz" onclick="startSession()">🔄 Go Again!</button>
+    </div>
+  </div>
+</div>
+<script>
+// ═══════════════════════════════════════════════
+//  STATS RECORDING (shared with other apps)
+// ═══════════════════════════════════════════════
+const APP_ID='soroban', APP_LABEL='Soroban Flash Trainer';
+function recordSession(score,maxScore,extra){
+  try{
+    const key='david-stats-v1';
+    const rec={app:APP_ID,appLabel:APP_LABEL,date:new Date().toISOString(),score,maxScore,pct:maxScore?score/maxScore:0,extra:extra||{}};
+    const existing=JSON.parse(localStorage.getItem(key)||'[]');
+    existing.push(rec);
+    if(existing.length>300) existing.splice(0,existing.length-300);
+    localStorage.setItem(key,JSON.stringify(existing));
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+//  GENERATION ENGINE
+// ═══════════════════════════════════════════════
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function randTermForLength(len){
+  if(len===1) return randInt(1,9);
+  if(len===2) return randInt(10,99);
+  return randInt(100,999);
+}
+function classifyColumnOp(v,d,op){
+  if(op==='add'){
+    const r=v+d;
+    if(r>=10) return 'ten';
+    if((v<5 && r>=5) || (v>=5 && r>=10)) return 'five';
+    return 'simple';
+  } else {
+    const r=v-d;
+    if(r<0) return 'ten';
+    if(v>=5 && r<5) return 'five';
+    return 'simple';
+  }
+}
+function digitsOf(n){
+  const s=String(Math.abs(n));
+  return s.split('').reverse().map(Number);
+}
+function classifyStep(runningTotal, term, op){
+  const rd=digitsOf(runningTotal), td=digitsOf(term);
+  const len=Math.max(rd.length, td.length);
+  let worst='simple';
+  const rank={simple:0, five:1, ten:2};
+  for(let i=0;i<len;i++){
+    const v=rd[i]||0, d=td[i]||0;
+    const lvl=classifyColumnOp(v,d,op);
+    if(rank[lvl]>rank[worst]) worst=lvl;
+  }
+  return worst;
+}
+function generateSequence(settings){
+  const rank={simple:0, five:1, ten:2};
+  let best=null;
+  for(let attempt=0; attempt<400; attempt++){
+    const terms=[];
+    let running=0;
+    let overall='simple';
+    for(let i=0;i<settings.termCount;i++){
+      let op = i===0 ? 'add' : settings.ops[randInt(0,settings.ops.length-1)];
+      let len = settings.digitLens[randInt(0,settings.digitLens.length-1)];
+      let val = randTermForLength(len);
+      if(op==='sub'){
+        if(running<=0){
+          op='add';
+        } else if(val>running){
+          const candidates=[];
+          for(const L of settings.digitLens){
+            const lo = L===1?1:(L===2?10:100);
+            if(lo<=running) candidates.push(L);
+          }
+          if(candidates.length===0){
+            val = randInt(1, running);
+          } else {
+            const L2 = candidates[randInt(0,candidates.length-1)];
+            const hi = L2===1?9:(L2===2?99:999);
+            val = randInt(L2===1?1:(L2===2?10:100), Math.min(hi, running));
+          }
+        }
+      }
+      const lvl=classifyStep(running, val, op);
+      if(rank[lvl]>rank[overall]) overall=lvl;
+      running = op==='add' ? running+val : running-val;
+      terms.push({value:val, op, runningAfter:running});
+    }
+    if(settings.complementFilter==='all' || overall===settings.complementFilter){
+      return {terms, total:running, overall};
+    }
+    if(!best) best={terms, total:running, overall};
+  }
+  return best;
+}
+
+// ═══════════════════════════════════════════════
+//  SOROBAN BEAD RENDERER
+// ═══════════════════════════════════════════════
+function renderColumn(digit, scale){
+  const heavenActive = digit>=5;
+  const earthCount = digit%5;
+  const beadH = 14*scale, beadW = 20*scale, colW = 24*scale;
+  let earthBeads='';
+  for(let i=0;i<earthCount;i++) earthBeads+=`<div class="sb-bead earth-bead-active" style="width:${beadW}px;height:${beadH}px;"></div>`;
+  for(let i=0;i<4-earthCount;i++) earthBeads+=`<div class="sb-bead earth-bead-inactive" style="width:${beadW}px;height:${beadH}px;"></div>`;
+  return `<div class="sb-col" style="width:${colW}px;">
+    <div class="sb-heaven ${heavenActive?'active':'inactive'}" style="height:${beadH*2}px;width:100%;">
+      <div class="sb-bead heaven-bead" style="width:${beadW}px;height:${beadH}px;"></div>
+    </div>
+    <div class="sb-bar" style="height:${Math.max(2,2*scale)}px;"></div>
+    <div class="sb-earth" style="height:${beadH*4.4}px;width:100%;">${earthBeads}</div>
+  </div>`;
+}
+function renderSorobanNumber(n, scale){
+  const digits=String(Math.abs(n)).split('').map(Number);
+  return `<div class="sb-number" style="padding:${10*scale}px ${9*scale}px;gap:${4*scale}px;">${digits.map(d=>renderColumn(d,scale)).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let settings={digitLens:[1],ops:['add'],complementFilter:'all',display:'digit',zoom:100,flash:800,gap:300,termCount:5,rounds:10};
+let curSeq=null, roundIdx=0, score=0, streak=0, bestStreak=0, correctCount=0;
+let flashTimer=null;
+
+function initChips(containerId, attr, arr){
+  document.querySelectorAll('#'+containerId+' .chip').forEach(chip=>{
+    chip.onclick=()=>{
+      const v=chip.dataset[attr];
+      if(containerId==='displayChips'){
+        document.querySelectorAll('#'+containerId+' .chip').forEach(c=>c.classList.remove('on'));
+        chip.classList.add('on');
+        settings.display=v;
+        return;
+      }
+      chip.classList.toggle('on');
+      const on=[...document.querySelectorAll('#'+containerId+' .chip.on')].map(c=>c.dataset[attr]);
+      if(on.length===0){ chip.classList.add('on'); return; } // never allow zero selection
+      if(attr==='len') settings.digitLens=on.map(Number);
+      else settings.ops=on;
+    };
+  });
+}
+initChips('digitChips','len');
+initChips('opChips','op');
+initChips('displayChips','disp');
+
+document.getElementById('zoomSlider').addEventListener('input',e=>{
+  settings.zoom=+e.target.value;
+  document.getElementById('zoomVal').textContent=settings.zoom+'%';
+});
+document.getElementById('flashSlider').addEventListener('input',e=>{
+  settings.flash=+e.target.value;
+  document.getElementById('flashVal').textContent=settings.flash+'ms';
+});
+document.getElementById('gapSlider').addEventListener('input',e=>{
+  settings.gap=+e.target.value;
+  document.getElementById('gapVal').textContent=settings.gap+'ms';
+});
+document.getElementById('termSlider').addEventListener('input',e=>{
+  settings.termCount=+e.target.value;
+  document.getElementById('termVal').textContent=settings.termCount;
+});
+document.getElementById('roundSlider').addEventListener('input',e=>{
+  settings.rounds=+e.target.value;
+  document.getElementById('roundVal').textContent=settings.rounds;
+});
+document.getElementById('complementSel').addEventListener('change',e=>{
+  settings.complementFilter=e.target.value;
+});
+
+function adjustZoom(delta){
+  settings.zoom=Math.max(50,Math.min(250,settings.zoom+delta));
+  document.getElementById('zoomLive').textContent=settings.zoom+'%';
+  document.getElementById('zoomSlider').value=settings.zoom;
+  document.getElementById('zoomVal').textContent=settings.zoom+'%';
+}
+
+function goSettings(){
+  clearTimeout(flashTimer);
+  document.getElementById('settingsScreen').style.display='block';
+  document.getElementById('playScreen').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startSession(){
+  roundIdx=0; score=0; streak=0; bestStreak=0; correctCount=0;
+  document.getElementById('settingsScreen').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('playScreen').style.display='block';
+  document.getElementById('qhScore').textContent='0';
+  document.getElementById('qhStreak').textContent='0🔥';
+  document.getElementById('zoomLive').textContent=settings.zoom+'%';
+  document.getElementById('zoomSlider').value=settings.zoom;
+  window.scrollTo({top:0,behavior:'smooth'});
+  playRound();
+}
+
+function playRound(){
+  clearTimeout(flashTimer);
+  document.getElementById('qhNum').textContent=`${roundIdx+1}/${settings.rounds}`;
+  document.getElementById('progFill').style.width=((roundIdx/settings.rounds)*100)+'%';
+  document.getElementById('answerArea').style.display='none';
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('answerIn').className='answer-input';
+  document.getElementById('answerIn').value='';
+  document.getElementById('answerIn').disabled=false;
+  document.getElementById('subBtn').disabled=false;
+
+  curSeq=generateSequence(settings);
+  const stage=document.getElementById('stage');
+  const phaseLabel=document.getElementById('phaseLabel');
+
+  let count=3;
+  phaseLabel.textContent='Get ready…';
+  function countdown(){
+    if(count>0){
+      stage.innerHTML=`<div class="countdown-num">${count}</div>`;
+      count--;
+      flashTimer=setTimeout(countdown,600);
+    } else {
+      flashSequence(0);
+    }
+  }
+  countdown();
+
+  function flashSequence(i){
+    if(i>=curSeq.terms.length){
+      stage.innerHTML=`<div class="waiting-dot"></div>`;
+      phaseLabel.textContent='Type the total!';
+      document.getElementById('answerArea').style.display='block';
+      setTimeout(()=>document.getElementById('answerIn').focus(),100);
+      return;
+    }
+    phaseLabel.textContent=`Number ${i+1} of ${curSeq.terms.length}`;
+    const t=curSeq.terms[i];
+    const scale=settings.zoom/100;
+    const sign = i===0 ? '' : (t.op==='add'?'+':'−');
+    let html='';
+    if(sign) html+=`<div class="flash-sign" style="font-size:${2*scale}rem;">${sign}</div>`;
+    if(settings.display==='digit' || settings.display==='both'){
+      html+=`<div class="flash-digit" style="font-size:${4*scale}rem;">${t.value}</div>`;
+    }
+    if(settings.display==='soroban' || settings.display==='both'){
+      html+=renderSorobanNumber(t.value, scale);
+    }
+    stage.innerHTML=html;
+    flashTimer=setTimeout(()=>{
+      stage.innerHTML=`<div class="waiting-dot"></div>`;
+      flashTimer=setTimeout(()=>flashSequence(i+1), settings.gap);
+    }, settings.flash);
+  }
+}
+
+function submitAnswer(){
+  const inp=document.getElementById('answerIn');
+  const val=inp.value.trim();
+  if(!val) { inp.focus(); return; }
+  const given=parseInt(val,10);
+  const correct = given===curSeq.total;
+
+  inp.disabled=true; document.getElementById('subBtn').disabled=true;
+  inp.className='answer-input '+(correct?'ok-in':'err-in');
+
+  const fb=document.getElementById('fb');
+  fb.style.display='block';
+  const replayHtml = curSeq.terms.map((t,i)=>{
+    const sign = i===0?'':(t.op==='add'?'+':'−');
+    return `<span class="replay-chip">${sign}${t.value} → ${t.runningAfter}</span>`;
+  }).join('');
+
+  if(correct){
+    correctCount++;
+    const pts=10+(streak>=2?5:0);
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak;
+    document.getElementById('qhScore').textContent=score;
+    document.getElementById('qhStreak').textContent=streak+'🔥';
+    fb.className='fb ok';
+    fb.innerHTML=`<span class="fb-title">🎯 Correct! Total = ${curSeq.total}</span>${streak>=3?`🔥 ${streak} in a row!`:'Great job adding it all up!'}<div class="replay-row">${replayHtml}</div>`;
+  } else {
+    streak=0;
+    document.getElementById('qhStreak').textContent='0🔥';
+    fb.className='fb err';
+    fb.innerHTML=`<span class="fb-title">The total was ${curSeq.total} (you said ${given || '—'})</span>Take a look at the sequence below to see where it adds up:<div class="replay-row">${replayHtml}</div>`;
+  }
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextRound(){
+  roundIdx++;
+  if(roundIdx>=settings.rounds) showResults();
+  else playRound();
+}
+
+function showResults(){
+  document.getElementById('playScreen').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+
+  const rawPct = correctCount/settings.rounds;
+  recordSession(correctCount, settings.rounds, {mode:settings.digitLens.join('+')+' cifre, '+settings.ops.join('/'), rawScore:score});
+
+  let trophy,title,sub;
+  if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`Every single round correct — your mental soroban is on fire! 🔥`;}
+  else if(rawPct>=.8){trophy='🥇';title='Outstanding, David!';sub=`${correctCount}/${settings.rounds} correct — brilliant mental maths!`;}
+  else if(rawPct>=.6){trophy='🥈';title='Great work, David!';sub=`${correctCount}/${settings.rounds} correct — keep practising!`;}
+  else if(rawPct>=.4){trophy='🎯';title='Good effort, David!';sub=`${correctCount}/${settings.rounds} correct — try slowing the flash speed a bit!`;}
+  else               {trophy='🌱';title='Keep training, David!';sub=`${correctCount}/${settings.rounds} correct — maybe try fewer digits or a slower flash!`;}
+
+  document.getElementById('rTrophy').textContent=trophy;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rStars').textContent=rawPct>=1?'⭐⭐⭐⭐⭐':rawPct>=.8?'⭐⭐⭐⭐':rawPct>=.6?'⭐⭐⭐':rawPct>=.4?'⭐⭐':'⭐';
+
+  const fl=document.getElementById('flList');
+  fl.innerHTML=`
+    <div class="fl-row"><span>✅ Correct Rounds</span><span class="flv">${correctCount}/${settings.rounds}</span></div>
+    <div class="fl-row"><span>⭐ Final Score</span><span class="flv">${score} pts</span></div>
+    <div class="fl-row"><span>🔥 Best Streak</span><span class="flv">${bestStreak} in a row</span></div>
+    <div class="fl-row"><span>🔢 Digits Used</span><span class="flv">${settings.digitLens.join(', ')}</span></div>
+    <div class="fl-row"><span>⚡ Flash Speed</span><span class="flv">${settings.flash}ms</span></div>
+  `;
+
+  const ml=document.getElementById('rMl');
+  if(rawPct>=.7){
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Fantastic mental maths, David! Your soroban brain is getting faster! 🧠⚡</p>
+      <p class="ro">🇷🇴 Calcul mental fantastic, David! Mintea ta de soroban devine tot mai rapidă! 🌟</p>
+      <p class="es">🇪🇸 ¡Cálculo mental fantástico, David! ¡Tu mente de ábaco es cada vez más rápida! 🏆</p>`;
+  } else {
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Good effort, David! Try a slower flash speed or fewer digits, then work back up! 💪</p>
+      <p class="ro">🇷🇴 Efort bun, David! Încearcă o viteză mai mică sau mai puține cifre, apoi urcă din nou! 📚</p>
+      <p class="es">🇪🇸 ¡Buen esfuerzo, David! ¡Prueba una velocidad más lenta y vuelve a intentarlo! 🔄</p>`;
+  }
+  if(rawPct>=.6) launchConfetti();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function launchConfetti(){
+  const cols=['#ffc107','#7bed9f','#ff6b35','#f72585','#90e0ef','#c77dff','#e8d5b0'];
+  for(let i=0;i<90;i++){setTimeout(()=>{const c=document.createElement('div');c.className='cp';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(1.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);},i*20);}
+}
+
+document.getElementById('answerIn').addEventListener('keydown',e=>{if(e.key==='Enter')submitAnswer();});
+</script>
+</body>
+</html>

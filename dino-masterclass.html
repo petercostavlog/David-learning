@@ -528,7 +528,7 @@ function recordSession(score,maxScore,extra){
   }catch(e){}
 }
 let chIdx=0, seenChs=new Set([0]);
-let qIdx=0, score=0, streak=0, bestStreak=0, answered=false, hintShown=false;
+let qIdx=0, score=0, streak=0, bestStreak=0, correctCount=0, answered=false, hintShown=false;
 
 // floaters
 const flEl=document.getElementById('floaters');
@@ -587,7 +587,7 @@ function goQuiz(){
   document.getElementById('resultsSection').style.display='none';
   document.getElementById('tabLearn').classList.remove('active');
   document.getElementById('tabQuiz').classList.add('active');
-  qIdx=0; score=0; streak=0; bestStreak=0; answered=false; hintShown=false;
+  qIdx=0; score=0; streak=0; bestStreak=0; correctCount=0; answered=false; hintShown=false;
   document.getElementById('qhScore').textContent='0';
   document.getElementById('qhStreak').textContent='0🔥';
   renderQ();
@@ -683,7 +683,7 @@ function processAns(correct,q){
   const fb=document.getElementById('fb'); fb.style.display='block';
   if(correct){
     const pts=10+(streak>=2?5:0)+(!hintShown?3:0);
-    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak;
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak; correctCount++;
     document.getElementById('qhScore').textContent=score;
     document.getElementById('qhStreak').textContent=streak+'🔥';
     fb.className='fb ok';
@@ -710,7 +710,7 @@ function showResults(){
   const correct=questions.filter((_,i)=>i<qIdx).length; // approx — tracked via score
   const pct=score/(questions.length*13); // max ~13pts per q with bonuses
   const rawPct = score / (questions.length * 10);
-  recordSession(score, questions.length*10, {});
+  recordSession(correctCount, questions.length, {rawScore:score});
 
   let trophy,title,sub;
   if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — you ARE the Dinosaur Masterclass champion! 🦕👑`;}
