@@ -55,7 +55,8 @@
   .countdown-num{font-family:'Boogaloo',cursive;color:var(--amber);text-shadow:2px 2px 0 #5a3800;font-size:5rem;animation:pop2 .8s ease;}
   @keyframes pop2{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 
-  .flash-sign{font-family:'Boogaloo',cursive;color:var(--sky);font-size:2rem;margin-bottom:6px;}
+  .flash-row{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;}
+  .flash-sign{font-family:'Boogaloo',cursive;color:var(--sky);}
   .flash-digit{font-family:'Boogaloo',cursive;color:white;text-shadow:0 0 30px rgba(255,193,7,.3);line-height:1;}
   .flash-progress{font-size:.75rem;color:rgba(255,255,255,.3);font-weight:800;margin-top:14px;}
 
@@ -158,6 +159,17 @@
           <div class="chip" data-op="sub">➖ Subtraction</div>
         </div>
         <div class="hint-line">Subtraction never goes below zero — just like a real soroban!</div>
+      </div>
+      <div class="set-row">
+        <div class="set-label">Answer size limit <span style="font-weight:700;color:rgba(255,255,255,.35)">(easy mode — keep the total small)</span></div>
+        <div class="chip-row" id="answerCapChips">
+          <div class="chip on" data-cap="0">No limit</div>
+          <div class="chip" data-cap="1">Max 1 digit</div>
+          <div class="chip" data-cap="2">Max 2 digits</div>
+          <div class="chip" data-cap="3">Max 3 digits</div>
+          <div class="chip" data-cap="4">Max 4 digits</div>
+        </div>
+        <div class="hint-line">Example: 1-digit numbers with "Max 1 digit" keeps the total under 10 — great for beginners. Pick "Max 2 digits" to let it grow a bit more.</div>
       </div>
       <div class="set-row">
         <div class="set-label">Bead technique needed <span style="font-weight:700;color:rgba(255,255,255,.35)">(bonus — since David knows the beads!)</span></div>
@@ -323,6 +335,7 @@ function classifyStep(runningTotal, term, op){
 }
 function generateSequence(settings){
   const rank={simple:0, five:1, ten:2};
+  const capMax = settings.answerCap>0 ? Math.pow(10,settings.answerCap)-1 : Infinity;
   let best=null;
   for(let attempt=0; attempt<400; attempt++){
     const terms=[];
@@ -348,6 +361,14 @@ function generateSequence(settings){
             const hi = L2===1?9:(L2===2?99:999);
             val = randInt(L2===1?1:(L2===2?10:100), Math.min(hi, running));
           }
+        }
+      }
+      if(op==='add' && isFinite(capMax)){
+        const remainingTerms = settings.termCount - i;
+        const room = capMax - running;
+        const fairShare = Math.max(1, Math.floor(room / remainingTerms));
+        if(val > fairShare){
+          val = randInt(1, fairShare);
         }
       }
       const lvl=classifyStep(running, val, op);
@@ -389,7 +410,7 @@ function renderSorobanNumber(n, scale){
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let settings={digitLens:[1],ops:['add'],complementFilter:'all',display:'digit',zoom:100,flash:800,gap:300,termCount:5,rounds:10,sound:true,voice:false};
+let settings={digitLens:[1],ops:['add'],complementFilter:'all',answerCap:0,display:'digit',zoom:100,flash:800,gap:300,termCount:5,rounds:10,sound:true,voice:false};
 let curSeq=null, roundIdx=0, score=0, streak=0, bestStreak=0, correctCount=0;
 let flashTimer=null;
 
@@ -408,6 +429,7 @@ function syncSettingsUI(){
   document.querySelectorAll('#opChips .chip').forEach(c=>c.classList.toggle('on', settings.ops.includes(c.dataset.op)));
   document.querySelectorAll('#displayChips .chip').forEach(c=>c.classList.toggle('on', settings.display===c.dataset.disp));
   document.querySelectorAll('#audioChips .chip').forEach(c=>c.classList.toggle('on', !!settings[c.dataset.audio]));
+  document.querySelectorAll('#answerCapChips .chip').forEach(c=>c.classList.toggle('on', settings.answerCap===+c.dataset.cap));
   document.getElementById('complementSel').value=settings.complementFilter;
   document.getElementById('zoomSlider').value=settings.zoom; document.getElementById('zoomVal').textContent=settings.zoom+'%';
   document.getElementById('flashSlider').value=settings.flash; document.getElementById('flashVal').textContent=settings.flash+'ms';
@@ -424,6 +446,13 @@ function initChips(containerId, attr, arr){
         document.querySelectorAll('#'+containerId+' .chip').forEach(c=>c.classList.remove('on'));
         chip.classList.add('on');
         settings.display=v;
+        saveSettings();
+        return;
+      }
+      if(containerId==='answerCapChips'){
+        document.querySelectorAll('#'+containerId+' .chip').forEach(c=>c.classList.remove('on'));
+        chip.classList.add('on');
+        settings.answerCap=+v;
         saveSettings();
         return;
       }
@@ -446,6 +475,7 @@ initChips('digitChips','len');
 initChips('opChips','op');
 initChips('displayChips','disp');
 initChips('audioChips','audio');
+initChips('answerCapChips','cap');
 
 loadSettings();
 syncSettingsUI();
@@ -610,15 +640,15 @@ function flashSequence(i){
   const t=curSeq.terms[i];
   const scale=settings.zoom/100;
   const sign = i===0 ? '' : (t.op==='add'?'+':'−');
-  let html='';
-  if(sign) html+=`<div class="flash-sign" style="font-size:${2*scale}rem;">${sign}</div>`;
+  let inner='';
+  if(sign) inner+=`<span class="flash-sign" style="font-size:${3*scale}rem;">${sign}</span>`;
   if(settings.display==='digit' || settings.display==='both'){
-    html+=`<div class="flash-digit" style="font-size:${4*scale}rem;">${t.value}</div>`;
+    inner+=`<div class="flash-digit" style="font-size:${4*scale}rem;">${t.value}</div>`;
   }
   if(settings.display==='soroban' || settings.display==='both'){
-    html+=renderSorobanNumber(t.value, scale);
+    inner+=renderSorobanNumber(t.value, scale);
   }
-  stage.innerHTML=html;
+  stage.innerHTML=`<div class="flash-row">${inner}</div>`;
   playTick();
   speakNumber((sign?(sign==='+'?'plus ':'minus '):'')+t.value);
   flashTimer=setTimeout(()=>{
