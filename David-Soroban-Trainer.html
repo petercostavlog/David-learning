@@ -98,6 +98,12 @@
   .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .4s ease;}
 
   .quit-link{display:block;text-align:center;margin-top:10px;font-size:.76rem;color:rgba(255,255,255,.3);font-weight:700;cursor:pointer;text-decoration:underline;}
+  .back-btn{display:block;width:100%;margin-top:12px;padding:12px;border-radius:50px;border:2px solid var(--border);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);font-family:'Boogaloo',cursive;font-size:1rem;cursor:pointer;transition:all .2s;}
+  .back-btn:hover{background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.25);}
+  .replay-btn{display:block;margin:4px auto 0;padding:8px 20px;border-radius:50px;border:1.5px dashed rgba(144,224,239,.4);background:rgba(144,224,239,.06);color:var(--sky);font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;cursor:pointer;transition:all .2s;}
+  .replay-btn:hover{background:rgba(144,224,239,.12);}
+  #soundToggleBtn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:rgba(255,255,255,.06);color:white;cursor:pointer;font-size:.85rem;margin-right:8px;}
+  #soundToggleBtn.muted{opacity:.4;}
 
   /* RESULTS */
   #resultsSection{display:none;text-align:center;}
@@ -179,6 +185,14 @@
         <input type="range" id="zoomSlider" min="50" max="250" value="100" step="10">
         <div class="hint-line">Sitting further from the screen? Turn this up!</div>
       </div>
+      <div class="set-row">
+        <div class="set-label">Sound &amp; voice</div>
+        <div class="chip-row" id="audioChips">
+          <div class="chip on" data-audio="sound">🔊 Tick sounds</div>
+          <div class="chip" data-audio="voice">🗣️ Speak numbers aloud</div>
+        </div>
+        <div class="hint-line">Tap to turn each on or off — both can be on together.</div>
+      </div>
     </div>
 
     <div class="set-card">
@@ -215,7 +229,10 @@
 
     <div class="play-hud">
       <span id="phaseLabel">Get ready…</span>
-      <span class="zoomctl">🔍 <button onclick="adjustZoom(-10)">−</button><span id="zoomLive">100%</span><button onclick="adjustZoom(10)">+</button></span>
+      <span class="zoomctl">
+        <button id="soundToggleBtn" onclick="toggleSound()" title="Sound on/off">🔊</button>
+        🔍 <button onclick="adjustZoom(-10)">−</button><span id="zoomLive">100%</span><button onclick="adjustZoom(10)">+</button>
+      </span>
     </div>
 
     <div class="stage" id="stage"></div>
@@ -225,11 +242,12 @@
         <input class="answer-input" id="answerIn" inputmode="numeric" placeholder="Total?" autocomplete="off"/>
         <button class="submit-btn" id="subBtn" onclick="submitAnswer()">✅ Check</button>
       </div>
+      <button class="replay-btn" id="replayBtn" onclick="replaySequence()">🔁 Replay Sequence</button>
       <div class="fb" id="fb"></div>
       <button class="next-btn" id="nextBtn" onclick="nextRound()">Next Round ➡️</button>
     </div>
 
-    <div class="quit-link" onclick="goSettings()">⬅️ Back to settings</div>
+    <button class="back-btn" onclick="goSettings()">⬅️ Back to Settings</button>
   </div>
 
   <!-- RESULTS -->
@@ -371,9 +389,32 @@ function renderSorobanNumber(n, scale){
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let settings={digitLens:[1],ops:['add'],complementFilter:'all',display:'digit',zoom:100,flash:800,gap:300,termCount:5,rounds:10};
+let settings={digitLens:[1],ops:['add'],complementFilter:'all',display:'digit',zoom:100,flash:800,gap:300,termCount:5,rounds:10,sound:true,voice:false};
 let curSeq=null, roundIdx=0, score=0, streak=0, bestStreak=0, correctCount=0;
 let flashTimer=null;
+
+const SETTINGS_KEY='soroban-settings-v1';
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }catch(e){}
+}
+function loadSettings(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null');
+    if(saved) settings=Object.assign(settings, saved);
+  }catch(e){}
+}
+function syncSettingsUI(){
+  document.querySelectorAll('#digitChips .chip').forEach(c=>c.classList.toggle('on', settings.digitLens.includes(+c.dataset.len)));
+  document.querySelectorAll('#opChips .chip').forEach(c=>c.classList.toggle('on', settings.ops.includes(c.dataset.op)));
+  document.querySelectorAll('#displayChips .chip').forEach(c=>c.classList.toggle('on', settings.display===c.dataset.disp));
+  document.querySelectorAll('#audioChips .chip').forEach(c=>c.classList.toggle('on', !!settings[c.dataset.audio]));
+  document.getElementById('complementSel').value=settings.complementFilter;
+  document.getElementById('zoomSlider').value=settings.zoom; document.getElementById('zoomVal').textContent=settings.zoom+'%';
+  document.getElementById('flashSlider').value=settings.flash; document.getElementById('flashVal').textContent=settings.flash+'ms';
+  document.getElementById('gapSlider').value=settings.gap; document.getElementById('gapVal').textContent=settings.gap+'ms';
+  document.getElementById('termSlider').value=settings.termCount; document.getElementById('termVal').textContent=settings.termCount;
+  document.getElementById('roundSlider').value=settings.rounds; document.getElementById('roundVal').textContent=settings.rounds;
+}
 
 function initChips(containerId, attr, arr){
   document.querySelectorAll('#'+containerId+' .chip').forEach(chip=>{
@@ -383,6 +424,13 @@ function initChips(containerId, attr, arr){
         document.querySelectorAll('#'+containerId+' .chip').forEach(c=>c.classList.remove('on'));
         chip.classList.add('on');
         settings.display=v;
+        saveSettings();
+        return;
+      }
+      if(containerId==='audioChips'){
+        chip.classList.toggle('on');
+        settings[v]=chip.classList.contains('on');
+        saveSettings();
         return;
       }
       chip.classList.toggle('on');
@@ -390,24 +438,32 @@ function initChips(containerId, attr, arr){
       if(on.length===0){ chip.classList.add('on'); return; } // never allow zero selection
       if(attr==='len') settings.digitLens=on.map(Number);
       else settings.ops=on;
+      saveSettings();
     };
   });
 }
 initChips('digitChips','len');
 initChips('opChips','op');
 initChips('displayChips','disp');
+initChips('audioChips','audio');
+
+loadSettings();
+syncSettingsUI();
 
 document.getElementById('zoomSlider').addEventListener('input',e=>{
   settings.zoom=+e.target.value;
   document.getElementById('zoomVal').textContent=settings.zoom+'%';
+  saveSettings();
 });
 document.getElementById('flashSlider').addEventListener('input',e=>{
   settings.flash=+e.target.value;
   document.getElementById('flashVal').textContent=settings.flash+'ms';
+  saveSettings();
 });
 document.getElementById('gapSlider').addEventListener('input',e=>{
   settings.gap=+e.target.value;
   document.getElementById('gapVal').textContent=settings.gap+'ms';
+  saveSettings();
 });
 document.getElementById('termSlider').addEventListener('input',e=>{
   settings.termCount=+e.target.value;
@@ -416,16 +472,64 @@ document.getElementById('termSlider').addEventListener('input',e=>{
 document.getElementById('roundSlider').addEventListener('input',e=>{
   settings.rounds=+e.target.value;
   document.getElementById('roundVal').textContent=settings.rounds;
+  saveSettings();
 });
 document.getElementById('complementSel').addEventListener('change',e=>{
   settings.complementFilter=e.target.value;
+  saveSettings();
 });
+
+// ═══════════════════════════════════════════════
+//  SOUND ENGINE (generated tones, no external files)
+// ═══════════════════════════════════════════════
+let audioCtx=null;
+function getAudioCtx(){
+  if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{}); }
+  return audioCtx;
+}
+function beep(freq, dur, type, vol){
+  if(!settings.sound) return;
+  const ctx=getAudioCtx(); if(!ctx) return;
+  const osc=ctx.createOscillator(), gain=ctx.createGain();
+  osc.type=type||'sine'; osc.frequency.value=freq;
+  gain.gain.setValueAtTime(vol||0.22, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(); osc.stop(ctx.currentTime+dur);
+}
+function playTick(){ beep(720, 0.09, 'sine', 0.18); }
+function playCountdownBeep(){ beep(440, 0.15, 'square', 0.16); }
+function playGo(){ beep(880, 0.25, 'sine', 0.22); }
+function playSuccess(){ beep(523,0.12,'sine',0.20); setTimeout(()=>beep(659,0.12,'sine',0.20),100); setTimeout(()=>beep(784,0.22,'sine',0.22),200); }
+function playError(){ beep(220,0.22,'sawtooth',0.16); setTimeout(()=>beep(160,0.28,'sawtooth',0.16),120); }
+
+function speakNumber(n){
+  if(!settings.voice) return;
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(String(n));
+    u.rate=1.05; u.pitch=1.0; u.volume=0.9;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function toggleSound(){
+  settings.sound=!settings.sound;
+  saveSettings();
+  const btn=document.getElementById('soundToggleBtn');
+  btn.textContent=settings.sound?'🔊':'🔇';
+  btn.classList.toggle('muted', !settings.sound);
+  if(settings.sound) playTick();
+}
 
 function adjustZoom(delta){
   settings.zoom=Math.max(50,Math.min(250,settings.zoom+delta));
   document.getElementById('zoomLive').textContent=settings.zoom+'%';
   document.getElementById('zoomSlider').value=settings.zoom;
   document.getElementById('zoomVal').textContent=settings.zoom+'%';
+  saveSettings();
 }
 
 function goSettings(){
@@ -437,6 +541,7 @@ function goSettings(){
 }
 
 function startSession(){
+  getAudioCtx(); // unlock/resume audio as early as possible in this click handler (Safari/iOS need this)
   roundIdx=0; score=0; streak=0; bestStreak=0; correctCount=0;
   document.getElementById('settingsScreen').style.display='none';
   document.getElementById('resultsSection').style.display='none';
@@ -445,6 +550,9 @@ function startSession(){
   document.getElementById('qhStreak').textContent='0🔥';
   document.getElementById('zoomLive').textContent=settings.zoom+'%';
   document.getElementById('zoomSlider').value=settings.zoom;
+  const sb=document.getElementById('soundToggleBtn');
+  sb.textContent=settings.sound?'🔊':'🔇';
+  sb.classList.toggle('muted', !settings.sound);
   window.scrollTo({top:0,behavior:'smooth'});
   playRound();
 }
@@ -456,54 +564,73 @@ function playRound(){
   document.getElementById('answerArea').style.display='none';
   document.getElementById('fb').style.display='none';
   document.getElementById('nextBtn').style.display='none';
+  document.getElementById('replayBtn').style.display='none';
   document.getElementById('answerIn').className='answer-input';
   document.getElementById('answerIn').value='';
   document.getElementById('answerIn').disabled=false;
   document.getElementById('subBtn').disabled=false;
 
   curSeq=generateSequence(settings);
+  runCountdownThenFlash();
+}
+
+function runCountdownThenFlash(){
+  clearTimeout(flashTimer);
   const stage=document.getElementById('stage');
   const phaseLabel=document.getElementById('phaseLabel');
-
   let count=3;
   phaseLabel.textContent='Get ready…';
   function countdown(){
     if(count>0){
       stage.innerHTML=`<div class="countdown-num">${count}</div>`;
+      playCountdownBeep();
       count--;
       flashTimer=setTimeout(countdown,600);
     } else {
+      playGo();
       flashSequence(0);
     }
   }
   countdown();
+}
 
-  function flashSequence(i){
-    if(i>=curSeq.terms.length){
-      stage.innerHTML=`<div class="waiting-dot"></div>`;
-      phaseLabel.textContent='Type the total!';
-      document.getElementById('answerArea').style.display='block';
-      setTimeout(()=>document.getElementById('answerIn').focus(),100);
-      return;
-    }
-    phaseLabel.textContent=`Number ${i+1} of ${curSeq.terms.length}`;
-    const t=curSeq.terms[i];
-    const scale=settings.zoom/100;
-    const sign = i===0 ? '' : (t.op==='add'?'+':'−');
-    let html='';
-    if(sign) html+=`<div class="flash-sign" style="font-size:${2*scale}rem;">${sign}</div>`;
-    if(settings.display==='digit' || settings.display==='both'){
-      html+=`<div class="flash-digit" style="font-size:${4*scale}rem;">${t.value}</div>`;
-    }
-    if(settings.display==='soroban' || settings.display==='both'){
-      html+=renderSorobanNumber(t.value, scale);
-    }
-    stage.innerHTML=html;
-    flashTimer=setTimeout(()=>{
-      stage.innerHTML=`<div class="waiting-dot"></div>`;
-      flashTimer=setTimeout(()=>flashSequence(i+1), settings.gap);
-    }, settings.flash);
+function flashSequence(i){
+  clearTimeout(flashTimer);
+  const stage=document.getElementById('stage');
+  const phaseLabel=document.getElementById('phaseLabel');
+  if(i>=curSeq.terms.length){
+    stage.innerHTML=`<div class="waiting-dot"></div>`;
+    phaseLabel.textContent='Type the total!';
+    document.getElementById('answerArea').style.display='block';
+    document.getElementById('replayBtn').style.display='block';
+    setTimeout(()=>document.getElementById('answerIn').focus(),100);
+    return;
   }
+  phaseLabel.textContent=`Number ${i+1} of ${curSeq.terms.length}`;
+  const t=curSeq.terms[i];
+  const scale=settings.zoom/100;
+  const sign = i===0 ? '' : (t.op==='add'?'+':'−');
+  let html='';
+  if(sign) html+=`<div class="flash-sign" style="font-size:${2*scale}rem;">${sign}</div>`;
+  if(settings.display==='digit' || settings.display==='both'){
+    html+=`<div class="flash-digit" style="font-size:${4*scale}rem;">${t.value}</div>`;
+  }
+  if(settings.display==='soroban' || settings.display==='both'){
+    html+=renderSorobanNumber(t.value, scale);
+  }
+  stage.innerHTML=html;
+  playTick();
+  speakNumber((sign?(sign==='+'?'plus ':'minus '):'')+t.value);
+  flashTimer=setTimeout(()=>{
+    stage.innerHTML=`<div class="waiting-dot"></div>`;
+    flashTimer=setTimeout(()=>flashSequence(i+1), settings.gap);
+  }, settings.flash);
+}
+
+function replaySequence(){
+  document.getElementById('answerArea').style.display='none';
+  document.getElementById('replayBtn').style.display='none';
+  runCountdownThenFlash();
 }
 
 function submitAnswer(){
@@ -515,6 +642,7 @@ function submitAnswer(){
 
   inp.disabled=true; document.getElementById('subBtn').disabled=true;
   inp.className='answer-input '+(correct?'ok-in':'err-in');
+  document.getElementById('replayBtn').style.display='none';
 
   const fb=document.getElementById('fb');
   fb.style.display='block';
@@ -524,6 +652,7 @@ function submitAnswer(){
   }).join('');
 
   if(correct){
+    playSuccess();
     correctCount++;
     const pts=10+(streak>=2?5:0);
     score+=pts; streak++; if(streak>bestStreak)bestStreak=streak;
@@ -532,6 +661,7 @@ function submitAnswer(){
     fb.className='fb ok';
     fb.innerHTML=`<span class="fb-title">🎯 Correct! Total = ${curSeq.total}</span>${streak>=3?`🔥 ${streak} in a row!`:'Great job adding it all up!'}<div class="replay-row">${replayHtml}</div>`;
   } else {
+    playError();
     streak=0;
     document.getElementById('qhStreak').textContent='0🔥';
     fb.className='fb err';
