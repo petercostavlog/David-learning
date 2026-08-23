@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Ancient Greeks Adventure!</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060e06; --green:#52b788; --lime:#7bed9f; --amber:#ffc107;
+    --fire:#ff6b35; --bone:#e8d5b0; --red:#f72585; --sky:#90e0ef;
+    --purple:#c77dff; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse at 15% 20%,rgba(199,125,255,.13) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(255,193,7,.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#060e06 0%,#020802 100%);}
+  .floaters{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .floaters span{position:absolute;opacity:.05;animation:floatUp linear infinite;}
+  @keyframes floatUp{0%{transform:translateY(105vh) rotate(0deg);opacity:0}5%{opacity:.05}95%{opacity:.05}100%{transform:translateY(-5vh) rotate(25deg);opacity:0}}
+
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:16px 14px 70px;}
+
+  .hdr{text-align:center;margin-bottom:20px;animation:dropIn .6s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes dropIn{from{transform:translateY(-44px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .hdr-badge{display:inline-block;background:rgba(199,125,255,.1);border:1.5px solid rgba(199,125,255,.3);border-radius:50px;padding:5px 16px;font-size:.78rem;font-weight:800;color:var(--purple);letter-spacing:.5px;margin-bottom:8px;}
+  .hdr h1{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,6vw,2.9rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800,0 0 30px rgba(255,193,7,.2);}
+  .hdr p{color:rgba(255,255,255,.4);font-weight:700;font-size:.86rem;margin-top:5px;}
+
+  .tabs{display:flex;gap:10px;margin-bottom:20px;animation:dropIn .5s .08s cubic-bezier(.34,1.56,.64,1) both;}
+  .tab{flex:1;padding:11px 6px;background:var(--card);border:2px solid var(--border);border-radius:16px;font-family:'Boogaloo',cursive;font-size:.92rem;color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;text-align:center;}
+  .tab.active{background:rgba(255,193,7,.12);border-color:var(--amber);color:var(--amber);box-shadow:0 0 16px rgba(255,193,7,.15);}
+  .tab:hover:not(.active){background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);}
+
+  .ch-dots{display:flex;justify-content:center;gap:7px;margin-bottom:18px;flex-wrap:wrap;}
+  .cdot{width:34px;height:34px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;transition:all .25s;}
+  .cdot.active{background:rgba(199,125,255,.2);border-color:var(--purple);transform:scale(1.2);box-shadow:0 0 12px rgba(199,125,255,.3);}
+  .cdot.done{background:rgba(123,237,159,.15);border-color:var(--lime);}
+
+  .ch-card{border-radius:26px;padding:28px 22px 22px;background:var(--card);border:2px solid rgba(199,125,255,.22);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  @keyframes cardIn{from{transform:scale(.9) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .ch-num{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(199,125,255,.6);margin-bottom:8px;}
+  .ch-title{font-family:'Boogaloo',cursive;font-size:clamp(1.3rem,4.5vw,1.95rem);color:var(--amber);margin-bottom:4px;text-shadow:1px 1px 0 #5a3800;}
+
+  .story{font-size:.95rem;color:rgba(255,255,255,.85);line-height:1.8;font-weight:600;margin-bottom:16px;}
+  .story strong{color:var(--amber);font-weight:900;}
+  .story em{color:var(--bone);font-style:normal;font-weight:800;}
+
+  .myth-box{background:rgba(199,125,255,.06);border:1.5px solid rgba(199,125,255,.25);border-radius:18px;padding:16px 18px;margin-bottom:16px;}
+  .myth-box .myth-title{font-family:'Boogaloo',cursive;color:var(--purple);font-size:1.1rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .myth-box p{font-size:.92rem;color:rgba(255,255,255,.85);line-height:1.75;font-weight:600;margin-bottom:8px;}
+  .myth-box p:last-child{margin-bottom:0;}
+  .myth-box strong{color:var(--amber);}
+
+  .facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .fbox{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 12px;}
+  .fbox .fi{font-size:1.8rem;display:block;margin-bottom:6px;}
+  .fbox .ft{font-family:'Boogaloo',cursive;font-size:.95rem;color:var(--amber);margin-bottom:4px;}
+  .fbox .fd{font-size:.78rem;color:rgba(255,255,255,.65);font-weight:700;line-height:1.5;}
+
+  .wow{background:rgba(255,107,53,.08);border:1.5px dashed rgba(255,107,53,.3);border-radius:14px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+  .wow .wi{font-size:1.4rem;flex-shrink:0;}
+  .wow .wt{font-size:.82rem;color:#ffb08a;font-weight:700;line-height:1.55;}
+  .wow .wt strong{color:var(--fire);}
+
+  /* GOD FLIP CARDS */
+  .god-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+  @media(max-width:480px){.god-grid{grid-template-columns:repeat(3,1fr);}}
+  .god-card{aspect-ratio:1;perspective:600px;cursor:pointer;}
+  .god-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+  .god-card.flipped .god-inner{transform:rotateY(180deg);}
+  .god-front,.god-back{position:absolute;inset:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;backface-visibility:hidden;padding:4px;}
+  .god-front{background:rgba(199,125,255,.1);border:1.5px solid rgba(199,125,255,.3);}
+  .god-front .ge{font-size:1.7rem;}
+  .god-front .gn{font-family:'Boogaloo',cursive;font-size:.72rem;color:var(--purple);margin-top:2px;text-align:center;}
+  .god-back{background:rgba(255,193,7,.12);border:1.5px solid rgba(255,193,7,.35);transform:rotateY(180deg);text-align:center;}
+  .god-back .gd{font-size:.62rem;color:var(--amber);font-weight:800;line-height:1.35;}
+  .god-hint{text-align:center;font-size:.72rem;color:rgba(255,255,255,.3);font-weight:700;margin:-6px 0 16px;font-style:italic;}
+
+  .timeline{display:flex;align-items:stretch;gap:0;margin:16px 0;overflow-x:auto;padding-bottom:4px;}
+  .tl-item{display:flex;flex-direction:column;align-items:center;min-width:100px;}
+  .tl-dot{width:38px;height:38px;border-radius:50%;border:3px solid;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;margin-bottom:8px;}
+  .tl-label{font-size:.68rem;font-weight:800;text-align:center;line-height:1.3;}
+  .tl-line{flex:1;height:3px;background:rgba(196,168,130,.2);margin-top:17px;min-width:20px;}
+
+  .ch-nav{display:flex;gap:10px;margin-top:4px;}
+  .ch-btn{flex:1;padding:13px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.05rem;cursor:pointer;transition:all .2s;}
+  .ch-prev{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:2px solid var(--border);}
+  .ch-prev:hover{background:rgba(255,255,255,.12);color:white;}
+  .ch-next{background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .ch-next:hover{transform:translateY(-2px);}
+  .ch-quiz{background:linear-gradient(135deg,var(--lime),var(--green));color:#060e06;box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .ch-quiz:hover{transform:translateY(-2px);}
+
+  #quizPhase{display:none;}
+  .q-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .qhb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:10px 6px;text-align:center;}
+  .qhb .qhv{font-family:'Boogaloo',cursive;font-size:1.35rem;color:white;display:block;}
+  .qhb .qhl{font-size:.62rem;color:rgba(255,255,255,.35);font-weight:800;text-transform:uppercase;}
+
+  .prog-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:8px;margin-bottom:18px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px rgba(123,237,159,.4);}
+
+  .q-card{border-radius:26px;padding:26px 22px 22px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  .q-top{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .q-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:1.5px solid;}
+  .q-type-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:800;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);}
+  .q-emoji-big{font-size:3rem;display:block;text-align:center;margin-bottom:10px;animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  .q-text{font-family:'Boogaloo',cursive;font-size:clamp(1.05rem,3.5vw,1.4rem);color:white;text-align:center;line-height:1.35;margin-bottom:8px;white-space:pre-line;}
+  .q-sub{font-size:.8rem;color:rgba(255,255,255,.4);text-align:center;font-weight:700;margin-bottom:14px;line-height:1.5;font-style:italic;}
+
+  .hint-box{background:rgba(255,193,7,.07);border:1.5px dashed rgba(255,193,7,.25);border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:.8rem;color:rgba(255,193,7,.7);font-weight:700;text-align:center;cursor:pointer;transition:all .2s;}
+  .hint-box:hover{background:rgba(255,193,7,.12);}
+  .hint-box.shown{cursor:default;color:var(--amber);border-style:solid;}
+
+  .opts-4{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .opts-6{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .opt{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:14px;padding:13px 8px;cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;color:white;text-align:center;line-height:1.3;}
+  .opt:hover:not(:disabled){background:rgba(82,183,136,.12);border-color:rgba(82,183,136,.4);transform:scale(1.03);}
+  .opt.correct{background:rgba(123,237,159,.22)!important;border-color:var(--lime)!important;animation:pop .35s cubic-bezier(.34,1.56,.64,1);}
+  .opt.wrong{background:rgba(247,37,133,.15)!important;border-color:var(--red)!important;animation:shk .3s ease;}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .type-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .type-input{width:100%;max-width:400px;padding:14px 18px;background:rgba(255,255,255,.07);border:2.5px solid rgba(255,255,255,.18);border-radius:16px;font-family:'Boogaloo',cursive;font-size:1.4rem;color:white;text-align:center;outline:none;transition:all .2s;caret-color:var(--amber);}
+  .type-input::placeholder{color:rgba(255,255,255,.22);font-size:1rem;}
+  .type-input:focus{border-color:rgba(255,193,7,.6);box-shadow:0 0 20px rgba(255,193,7,.15);}
+  .type-input.ok-in{border-color:var(--lime);background:rgba(123,237,159,.08);}
+  .type-input.err-in{border-color:var(--red);background:rgba(247,37,133,.07);}
+  .submit-btn{padding:13px 34px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .submit-btn:hover{transform:translateY(-2px);}
+  .submit-btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  .fb{border-radius:13px;padding:13px 16px;margin-top:13px;font-weight:700;font-size:.88rem;line-height:1.55;animation:fadeUp .3s ease both;display:none;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .fb.ok{background:rgba(123,237,159,.1);border:1.5px solid var(--lime);color:#b7f5c8;}
+  .fb.err{background:rgba(247,37,133,.08);border:1.5px solid var(--red);color:#ffaacc;}
+
+  .next-btn{display:none;width:100%;margin-top:12px;padding:14px;border:none;border-radius:50px;cursor:pointer;transition:all .2s;font-family:'Boogaloo',cursive;font-size:1.15rem;color:#060e06;background:linear-gradient(135deg,var(--amber),var(--fire));box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .next-btn:hover{transform:translateY(-2px);}
+
+  #resultsSection{display:none;text-align:center;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  .r-trophy{font-size:5.5rem;display:block;margin-bottom:12px;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .r-title{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800;margin-bottom:6px;}
+  .r-sub{color:rgba(255,255,255,.5);font-weight:700;font-size:.95rem;margin-bottom:18px;}
+  .r-stars{font-size:2rem;letter-spacing:6px;margin-bottom:18px;}
+  .facts-learned{background:var(--card);border:1.5px solid rgba(199,125,255,.22);border-radius:18px;padding:16px;margin-bottom:16px;text-align:left;max-height:340px;overflow-y:auto;}
+  .facts-learned h3{font-family:'Boogaloo',cursive;color:var(--amber);font-size:1rem;margin-bottom:12px;}
+  .fl-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:700;line-height:1.45;}
+  .ml-box{background:rgba(255,255,255,.03);border:1.5px solid rgba(144,224,239,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.83rem;text-align:left;}
+  .ml-box p{margin-bottom:5px;line-height:1.55;}
+  .ml-box .en{color:var(--amber);font-weight:800;}
+  .ml-box .ro{color:var(--lime);font-weight:800;}
+  .ml-box .es{color:var(--sky);font-weight:800;}
+  .r-btns{display:flex;gap:10px;}
+  .r-btn{flex:1;padding:14px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;color:#060e06;}
+  .r-btn-learn{background:rgba(255,255,255,.08);color:white;border:2px solid var(--border);}
+  .r-btn-learn:hover{background:rgba(255,255,255,.13);}
+  .r-btn-quiz{background:linear-gradient(135deg,var(--lime),var(--green));box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .r-btn-quiz:hover{transform:scale(1.03);}
+
+  .cp{position:fixed;width:9px;height:9px;top:-9px;border-radius:2px;animation:cf linear forwards;z-index:999;pointer-events:none;}
+  @keyframes cf{to{transform:translateY(106vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="floaters" id="floaters"></div>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-badge">🏛️ ANCIENT GREEKS — GODS, HEROES & LEGENDS</div>
+    <h1>Gods, Heroes & Legends! ⚡</h1>
+    <p>Read all 8 chapters → then take the big 30-question quiz!</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabLearn" onclick="goLearn()">📖 Learn</button>
+    <button class="tab"        id="tabQuiz"  onclick="goQuiz()">⚡ Quiz Me!</button>
+  </div>
+
+  <div id="learnPhase">
+    <div class="ch-dots" id="chDots"></div>
+    <div id="chArea"></div>
+  </div>
+
+  <div id="quizPhase">
+    <div class="q-hud">
+      <div class="qhb"><span class="qhv" id="qhScore">0</span><span class="qhl">⭐ Score</span></div>
+      <div class="qhb"><span class="qhv" id="qhStreak">0🔥</span><span class="qhl">Streak</span></div>
+      <div class="qhb"><span class="qhv" id="qhNum">1/30</span><span class="qhl">Question</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="q-card" id="qCard">
+      <div class="q-top">
+        <span class="q-tag" id="qTag" style="color:var(--purple);border-color:var(--purple)55;background:var(--purple)12">🏛️ Greeks</span>
+        <span class="q-type-pill" id="qTypePill">CHOOSE</span>
+      </div>
+      <span class="q-emoji-big" id="qEmoji">🏛️</span>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="q-sub"  id="qSub"></div>
+      <div class="hint-box" id="hintBox" onclick="showHint()">💡 Tap for a hint</div>
+      <div id="answerArea"></div>
+      <div class="fb" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">Next ➡️</button>
+    </div>
+  </div>
+
+  <div id="resultsSection">
+    <span class="r-trophy" id="rTrophy">🏆</span>
+    <div class="r-title" id="rTitle">Amazing, David!</div>
+    <div class="r-sub"   id="rSub"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="facts-learned">
+      <h3>🏛️ Everything you learned today:</h3>
+      <div id="flList"></div>
+    </div>
+    <div class="ml-box" id="rMl"></div>
+    <div class="r-btns">
+      <button class="r-btn r-btn-learn" onclick="goLearn()">📖 Review Lesson</button>
+      <button class="r-btn r-btn-quiz"  onclick="goQuiz()">🔄 Try Quiz Again!</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const gods = [
+  {e:'⚡',n:'Zeus',d:'King of the Gods, ruler of the sky and thunder!'},
+  {e:'🌊',n:'Poseidon',d:'God of the sea, earthquakes and horses!'},
+  {e:'🦉',n:'Athena',d:'Goddess of wisdom and clever war strategy!'},
+  {e:'☀️',n:'Apollo',d:'God of the sun, music, poetry and healing!'},
+  {e:'🏹',n:'Artemis',d:'Goddess of the hunt, the moon and wild animals!'},
+  {e:'⚔️',n:'Ares',d:'God of war — hot-headed and loved a fight!'},
+  {e:'💗',n:'Aphrodite',d:'Goddess of love and beauty!'},
+  {e:'🔨',n:'Hephaestus',d:'God of fire and blacksmiths — made magic weapons!'},
+  {e:'👟',n:'Hermes',d:'Messenger god with winged sandals — super fast!'},
+  {e:'🌾',n:'Demeter',d:'Goddess of the harvest and growing crops!'},
+  {e:'🍇',n:'Dionysus',d:'God of wine, parties and theatre!'},
+  {e:'👑',n:'Hera',d:'Queen of the Gods, goddess of marriage — and VERY jealous of Zeus!'}
+];
+
+const chapters = [
+  {
+    emoji:'🏺', title:'Who Were the Ancient Greeks?',
+    content:`
+      <p class="story">Long before phones, cars or even England as we know it, an amazing civilisation was
+      thriving around the sunny Aegean Sea. The Ancient Greeks weren't one single country — they were made up
+      of hundreds of independent <strong>city-states</strong>, each with its own rulers, army and rules!</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#ff6b35;background:rgba(255,107,53,.15)">🏺</div>
+          <div class="tl-label" style="color:#ff6b35">Bronze Age<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">3000–1200 BC<br>Early Greece</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#ffc107;background:rgba(255,193,7,.15)">🏛️</div>
+          <div class="tl-label" style="color:#ffc107">Classical Greece<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">500–323 BC<br>Golden Age!</span></div>
+        </div><div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:#c77dff;background:rgba(199,125,255,.15)">🗺️</div>
+          <div class="tl-label" style="color:#c77dff">Hellenistic Era<br><span style="font-size:.6rem;color:rgba(255,255,255,.35)">323–30 BC<br>Alexander's empire</span></div>
+        </div>
+      </div>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🏛️</span><div class="ft">Athens</div><div class="fd">The most famous city-state — birthplace of democracy, philosophy and huge temples like the Parthenon!</div></div>
+        <div class="fbox"><span class="fi">⚔️</span><div class="ft">Sparta</div><div class="fd">Athens' biggest rival — a city obsessed with being the toughest warriors in Greece!</div></div>
+        <div class="fbox"><span class="fi">🌊</span><div class="ft">The Aegean Sea</div><div class="fd">Greece is full of mountains and islands, so the Greeks became brilliant sailors and traders.</div></div>
+        <div class="fbox"><span class="fi">🗣️</span><div class="ft">One Language</div><div class="fd">Even though city-states often fought each other, they all spoke Greek and worshipped the same gods!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">Athens and Sparta were <strong>rivals for over 200 years</strong> — sometimes fighting wars against each other, even though they were both "Greek"! Imagine if every city in Britain had its own king and army!</div></div>`,
+    facts:['Ancient Greece was made of independent city-states, not one country','Athens and Sparta were the two most famous (and rival) city-states','Classical Greece (500-323 BC) is called the "Golden Age"','All Greek city-states shared the same language and gods']
+  },
+  {
+    emoji:'⚡', title:'Mount Olympus — Meet the Gods',
+    content:`
+      <p class="story">High above the clouds, on the tallest mountain in Greece, lived the twelve most powerful
+      beings in the universe — the <strong>Olympian Gods</strong>. They looked human, but had incredible
+      powers, terrible tempers, and LOVED to argue with each other!</p>
+      <div class="myth-box">
+        <div class="myth-title">📖 The Story of How Zeus Became King</div>
+        <p>Long ago, the world was ruled by Titans — giant god-like beings. Their king, <strong>Cronus</strong>,
+        was so afraid one of his children would overthrow him that he swallowed each baby whole the moment
+        they were born! His wife Rhea was heartbroken, so when her youngest son <strong>Zeus</strong> was born,
+        she hid him away and tricked Cronus into swallowing a rock wrapped in a blanket instead.</p>
+        <p>Zeus grew up in secret, then returned as an adult to defeat his father and free his swallowed
+        brothers and sisters. Together, they became the twelve Olympian gods — and Zeus became their king!</p>
+      </div>
+      <p class="story">Tap each god below to reveal what they were the god OF:</p>
+      <div class="god-grid" id="godGrid"></div>
+      <div class="god-hint">👆 Tap a card to flip it and reveal their power!</div>
+      <div class="wow"><span class="wi">😤</span><div class="wt">Zeus's wife <strong>Hera</strong> was famously jealous — Zeus had a habit of falling for mortals, and Hera spent a LOT of her time getting revenge on them. She once turned a girl into a cow!</div></div>`,
+    facts:['The 12 Olympian gods lived on Mount Olympus','Zeus became king of the gods after defeating his father Cronus, a Titan','Hera, Zeus\'s wife, was the goddess of marriage — and very jealous!','Each god had their own special power, like Poseidon (sea) or Athena (wisdom)']
+  },
+  {
+    emoji:'🦁', title:'Hercules and His Impossible Labors',
+    content:`
+      <p class="story">Hercules was the strongest man who ever lived — the son of Zeus himself! But because
+      Hera (remember her?) hated Zeus's mortal children, she cursed Hercules with a fit of madness. To make up
+      for what happened, Hercules had to complete <strong>12 impossible tasks</strong> set by a king. Here are
+      three of the wildest:</p>
+      <div class="myth-box">
+        <div class="myth-title">🦁 Labor 1: The Nemean Lion</div>
+        <p>A lion with golden fur so tough that NO weapon could pierce it was terrorising the land. Hercules
+        tried shooting arrows — they just bounced off! So he wrestled the lion with his bare hands and
+        defeated it. Afterwards, he wore its skin as armour, since nothing could cut through it either!</p>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🐍 Labor 2: The Hydra</div>
+        <p>The Hydra was a monstrous snake with MANY heads — and here's the terrifying part: <strong>every
+        time you cut off one head, TWO more grew back!</strong> Hercules figured out the trick: after chopping
+        each head, his nephew burned the stump with fire so no new heads could grow. Clever teamwork!</p>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🍎 Labor 3: The Golden Apples</div>
+        <p>For his final labor, Hercules had to fetch golden apples guarded by a hundred-headed dragon, from a
+        garden at the edge of the world. He even briefly held up the sky for the titan Atlas in exchange for
+        help getting them!</p>
+      </div>
+      <div class="wow"><span class="wi">💪</span><div class="wt">The word "<strong>herculean</strong>" — meaning an incredibly difficult task — comes directly from Hercules! People still use it today, thousands of years later.</div></div>`,
+    facts:['Hercules was the son of Zeus and the strongest man alive','He had to complete 12 impossible labors as punishment','He defeated the Nemean Lion, which no weapon could pierce','The Hydra grew two heads for every one that was cut off!','The word "herculean" (meaning super difficult) comes from his name']
+  },
+  {
+    emoji:'🐴', title:'The Trojan War & the Wooden Horse',
+    content:`
+      <p class="story">This is one of the most famous stories ever told — a war that lasted <strong>TEN
+      YEARS</strong>, all because of a prince, a queen, and one very sneaky trick.</p>
+      <div class="myth-box">
+        <div class="myth-title">👑 How It All Began</div>
+        <p>Paris, a prince of the city of Troy, ran off with Helen — the most beautiful woman in the world, and
+        already married to a Greek king! Furious, the Greeks gathered a huge army and sailed to Troy to get
+        her back. But Troy's walls were so strong, the Greeks couldn't break through... for ten whole years.</p>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🐴 The Trick That Won the War</div>
+        <p>Finally, the clever Greek hero <strong>Odysseus</strong> had an idea. The Greeks built a GIANT
+        wooden horse, hid their best soldiers inside it, and pretended to sail away, leaving the horse as a
+        "gift." The Trojans, thinking they'd won, dragged the horse inside their city walls to celebrate.</p>
+        <p>That night, the hidden Greek soldiers crept out, opened the city gates for the rest of their army —
+        and Troy fell in a single night, after holding out for ten whole years!</p>
+      </div>
+      <div class="wow"><span class="wi">🦶</span><div class="wt">The greatest Greek warrior, <strong>Achilles</strong>, was nearly invincible — except for one tiny spot on his heel. That's exactly where he was struck and killed! That's why we still call a weak point your <strong>"Achilles' heel"</strong> today.</div></div>`,
+    facts:['The Trojan War lasted 10 years over Helen of Troy','The Greeks hid soldiers inside a giant wooden horse to trick Troy','Troy fell in one night after 10 years of failed attacks','Achilles was nearly invincible except for his heel — the origin of "Achilles\' heel"!']
+  },
+  {
+    emoji:'🐍', title:'Monsters, Mazes & Mistakes',
+    content:`
+      <p class="story">Greek myths are PACKED with monsters and warnings. Here are three unforgettable tales:</p>
+      <div class="myth-box">
+        <div class="myth-title">🐍 Medusa — Don't Look At Her!</div>
+        <p>Medusa had living snakes for hair, and anyone who looked directly at her turned instantly to
+        stone! The hero <strong>Perseus</strong> defeated her by looking only at her reflection in his
+        polished shield, then cutting off her head without ever meeting her eyes.</p>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🐂 The Minotaur's Maze</div>
+        <p>Half man, half bull, the Minotaur lived deep inside an enormous maze called the Labyrinth, built so
+        cleverly that no one could ever find their way out. The hero Theseus entered to defeat the monster —
+        but he only found his way back out by unrolling a ball of string as he went in!</p>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🕊️ Icarus and the Wax Wings</div>
+        <p>A clever inventor built wings from feathers and wax so he and his son <strong>Icarus</strong> could
+        escape an island by flying. He warned Icarus: don't fly too high, or the sun will melt the wax! Icarus
+        got carried away with excitement, flew too high anyway... and fell into the sea.</p>
+      </div>
+      <div class="wow"><span class="wi">📦</span><div class="wt">Ever heard of opening a <strong>"Pandora's box"</strong>? In the myth, Pandora was given a box she was told never to open — of course, curiosity got the better of her, and out flew every trouble in the world!</div></div>`,
+    facts:['Medusa turned people to stone if they looked directly at her','Perseus defeated Medusa using his shield as a mirror','The Minotaur lived in a maze called the Labyrinth','Icarus flew too close to the sun and his wax wings melted','"Opening a Pandora\'s box" means releasing lots of trouble, from the myth of Pandora']
+  },
+  {
+    emoji:'🏃', title:'The First Olympic Games',
+    content:`
+      <p class="story">Long before Paris 2024 or London 2012, the VERY FIRST Olympic Games were held in
+      <strong>776 BC</strong> in a place called Olympia — nearly 2,800 years ago! They were so important that
+      Greek city-states, even ones at war with each other, agreed to a special truce so athletes could travel
+      safely.</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🕊️</span><div class="ft">The Olympic Truce</div><div class="fd">Wars were paused for the games! Nothing was allowed to stop the competition — not even fighting.</div></div>
+        <div class="fbox"><span class="fi">🫣</span><div class="ft">No Clothes Allowed!</div><div class="fd">Athletes competed completely naked — the word "gymnastics" even comes from the Greek word for "naked"!</div></div>
+        <div class="fbox"><span class="fi">🌿</span><div class="ft">Olive Wreath Prize</div><div class="fd">Winners didn't get gold medals — just a simple crown of olive leaves. But the HONOUR was everything!</div></div>
+        <div class="fbox"><span class="fi">🚫</span><div class="ft">Women Not Allowed</div><div class="fd">Married women couldn't even watch! But there was a separate running race just for unmarried girls.</div></div>
+      </div>
+      <div class="wow"><span class="wi">🏃</span><div class="wt">The very first Olympic champion in history was a cook named <strong>Coroebus</strong>, who won the only event that first year — a short sprint race. His name has been remembered for almost 2,800 years!</div></div>`,
+    facts:['The first Olympics were held in 776 BC in Olympia','Wars were paused for a special Olympic Truce','Athletes competed completely naked','Winners received an olive wreath crown, not a medal','The first ever Olympic champion was a cook named Coroebus']
+  },
+  {
+    emoji:'🗳️', title:'Democracy, Philosophers & Daily Life',
+    content:`
+      <p class="story">The Ancient Greeks — especially in Athens — invented an idea that still shapes the
+      whole world today: <strong>democracy</strong>, meaning "rule by the people"!</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🗳️</span><div class="ft">People Power</div><div class="fd">Citizens could vote directly on laws in a huge outdoor meeting called the Assembly!</div></div>
+        <div class="fbox"><span class="fi">⚠️</span><div class="ft">Not Everyone Could Vote</div><div class="fd">Only free adult men born in Athens could vote — not women, foreigners, or enslaved people. Very different from today!</div></div>
+        <div class="fbox"><span class="fi">🤔</span><div class="ft">Great Thinkers</div><div class="fd">Socrates, Plato and Aristotle asked huge questions about life, right and wrong — the start of "philosophy," meaning "love of wisdom"!</div></div>
+        <div class="fbox"><span class="fi">🏺</span><div class="ft">The Agora</div><div class="fd">The buzzing marketplace at the heart of every city — for shopping, chatting, politics and gossip!</div></div>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">⚔️ Meanwhile, in Sparta…</div>
+        <p>Spartan life was VERY different. Boys left home at just 7 years old to begin brutal military
+        training, learning to survive in the wild and fight from a young age. Spartans valued toughness above
+        almost everything else — their whole society was built around having the strongest army in Greece.</p>
+      </div>
+      <div class="wow"><span class="wi">💭</span><div class="wt">Socrates was so famous for asking difficult questions that he was eventually put on trial and sentenced to death for "corrupting young minds" with his questions! He calmly accepted his fate rather than stop questioning.</div></div>`,
+    facts:['Athens invented democracy — but only free men could vote','Socrates, Plato and Aristotle were famous Greek philosophers','The agora was the bustling marketplace at the center of a city','Spartan boys began military training at just 7 years old']
+  },
+  {
+    emoji:'🏛️', title:'The Greek Legacy — Still All Around Us',
+    content:`
+      <p class="story">Ancient Greece may have ended over 2,000 years ago, but you use their ideas and words
+      <strong>every single day</strong> without even realising it!</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🔤</span><div class="ft">English Words</div><div class="fd">"Telephone" (far + sound), "democracy," "marathon," "alphabet" (alpha + beta) all come from Greek!</div></div>
+        <div class="fbox"><span class="fi">🏛️</span><div class="ft">Architecture</div><div class="fd">Greek columns (Doric, Ionic, Corinthian) are copied on buildings all over the world, even today!</div></div>
+        <div class="fbox"><span class="fi">🎭</span><div class="ft">Theatre</div><div class="fd">The Greeks invented theatre — and the comedy/tragedy masks are still the symbol of drama today!</div></div>
+        <div class="fbox"><span class="fi">📐</span><div class="ft">Maths & Science</div><div class="fd">Pythagoras (triangles!) and Archimedes ("Eureka!" in the bathtub) laid foundations we still use in school.</div></div>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🏃 The Marathon's True Story</div>
+        <p>After a Greek victory at the Battle of Marathon, a messenger named Pheidippides supposedly ran
+        about 25 miles non-stop to Athens to deliver the news — then collapsed. That's why a long-distance race
+        today is called a "marathon"!</p>
+      </div>
+      <p class="story">The modern Olympic Games were even brought BACK in 1896, almost 1,500 years after the
+      original games stopped — inspired directly by what you've just learned about! From democracy to
+      marathons to the very alphabet you're reading right now — Ancient Greece truly never left us. 🏛️</p>`,
+    facts:['Many English words like "telephone" and "marathon" come from Greek','Greek architecture (columns) is copied on buildings worldwide today','The Greeks invented theatre and its comedy/tragedy masks','Pythagoras and Archimedes were famous Greek mathematicians','The modern Olympics were revived in 1896, inspired by the ancient games']
+  }
+];
+
+const questions = [
+  { cat:'🏺 City-States', type:'pick4', e:'🏛️', col:'#c77dff',
+    q:'Which two Greek city-states were famous rivals?',
+    sub:'One valued philosophy and democracy, the other valued warriors',
+    hint:'One begins with A, the other with S…',
+    opts:['Athens and Sparta','Rome and Athens','Sparta and Troy','Athens and Olympia'], c:0,
+    ok:'🏛️ Athens and Sparta! Two of the most powerful (and rival) city-states in Greece!',
+    err:'ATHENS AND SPARTA — famous rivals, even though both were Greek!' },
+  { cat:'🏺 City-States', type:'pick4', e:'🌊', col:'#c77dff',
+    q:'What sea surrounded most of Ancient Greece, making its people great sailors?',
+    sub:'It\'s between Greece and modern-day Turkey',
+    hint:'Starts with "Ae"…',
+    opts:['The Aegean Sea','The Atlantic Ocean','The Red Sea','The Baltic Sea'], c:0,
+    ok:'🌊 The Aegean Sea! Its many islands made the Greeks brilliant sailors and traders!',
+    err:'The AEGEAN SEA — its islands and mountains shaped how Greeks lived and travelled!' },
+  { cat:'⚡ The Gods', type:'type', e:'⚡', col:'#ffc107',
+    q:'Who was the King of all the Gods, ruler of the sky and thunder?',
+    sub:'He defeated his father Cronus to become king',
+    hint:'His name is also a battery brand!',
+    accept:['zeus'],
+    ok:'⚡ ZEUS! King of the Olympian gods and ruler of thunder!',
+    err:'ZEUS — the king of the gods, ruler of the sky and thunder!' },
+  { cat:'⚡ The Gods', type:'pick4', e:'🌊', col:'#ffc107',
+    q:'Which god ruled the sea, earthquakes and horses?',
+    sub:'He carried a three-pronged trident',
+    hint:'Not Zeus — his brother…',
+    opts:['Hades','Poseidon','Apollo','Ares'], c:1,
+    ok:'🌊 POSEIDON! God of the sea, earthquakes and horses!',
+    err:'POSEIDON — Zeus\'s brother, god of the sea!' },
+  { cat:'⚡ The Gods', type:'pick4', e:'🦉', col:'#ffc107',
+    q:'Which goddess represented wisdom and clever war strategy?',
+    sub:'An owl is her symbol',
+    hint:'The city of Athens is named after her…',
+    opts:['Aphrodite','Hera','Athena','Artemis'], c:2,
+    ok:'🦉 ATHENA! Goddess of wisdom — the city of Athens is named after her!',
+    err:'ATHENA — goddess of wisdom, with an owl as her symbol!' },
+  { cat:'⚡ The Gods', type:'pick4', e:'👑', col:'#ffc107',
+    q:'Who was Zeus\'s wife, Queen of the Gods, famous for being very jealous?',
+    sub:'Goddess of marriage',
+    hint:'Not Athena or Aphrodite…',
+    opts:['Demeter','Hera','Artemis','Hestia'], c:1,
+    ok:'👑 HERA! Queen of the gods, and famously jealous of Zeus\'s mortal romances!',
+    err:'HERA — Zeus\'s wife, Queen of the Gods, goddess of marriage!' },
+  { cat:'⚡ The Gods', type:'type', e:'👴', col:'#ffc107',
+    q:'What was the name of the Titan king that Zeus defeated to become ruler of the gods?',
+    sub:'He used to swallow his own children!',
+    hint:'Starts with "Cr"…',
+    accept:['cronus','kronos'],
+    ok:'👴 CRONUS! He swallowed his children out of fear, until Zeus defeated him!',
+    err:'CRONUS — the Titan king who swallowed his children, defeated by Zeus!' },
+  { cat:'🦁 Hercules', type:'type', e:'🦁', col:'#ff6b35',
+    q:'Whose son was Hercules, making him incredibly strong?',
+    sub:'The king of the gods',
+    hint:'Same answer as "who ruled Mount Olympus"…',
+    accept:['zeus'],
+    ok:'🦁 ZEUS! That\'s why Hercules was superhumanly strong!',
+    err:'ZEUS — Hercules was his son, making him incredibly strong!' },
+  { cat:'🦁 Hercules', type:'pick4', e:'🐍', col:'#ff6b35',
+    q:'What strange power did the Hydra monster have?',
+    sub:'This made it very hard to defeat!',
+    hint:'Think about what happens when you cut off a head…',
+    opts:['It could fly', 'Two heads grew back for every one cut off!', 'It breathed fire', 'It turned invisible'], c:1,
+    ok:'🐍 TWO heads grew back for every one Hercules cut off — until his nephew helped by burning each stump!',
+    err:'For every head cut off, TWO grew back! Hercules needed help burning the stumps to stop it!' },
+  { cat:'🦁 Hercules', type:'pick4', e:'💪', col:'#ff6b35',
+    q:'The word "herculean" (meaning an extremely difficult task) comes from which hero?',
+    sub:'You just read about him!',
+    hint:'The strongest man alive…',
+    opts:['Achilles','Perseus','Hercules','Theseus'], c:2,
+    ok:'💪 HERCULES! His incredible feats gave us the word "herculean"!',
+    err:'HERCULES — his amazing strength gave us the word "herculean"!' },
+  { cat:'🐴 Trojan War', type:'type', e:'🐴', col:'#7bed9f',
+    q:'What did the Greeks hide their soldiers inside to trick the city of Troy?',
+    sub:'It looked like a "gift"',
+    hint:'A very large wooden animal…',
+    accept:['horse','wooden horse','a wooden horse'],
+    ok:'🐴 A WOODEN HORSE! Hidden soldiers snuck out at night to open Troy\'s gates!',
+    err:'A WOODEN HORSE — the trick that finally ended the 10-year war!' },
+  { cat:'🐴 Trojan War', type:'pick4', e:'⏳', col:'#7bed9f',
+    q:'About how many YEARS did the Trojan War last?',
+    sub:'A surprisingly long siege!',
+    hint:'The same number of items in a "perfect score"…',
+    opts:['1 year','5 years','10 years','50 years'], c:2,
+    ok:'⏳ 10 YEARS! Troy\'s walls were so strong the Greeks couldn\'t break through for a decade!',
+    err:'10 YEARS! One of the longest sieges in Greek legend!' },
+  { cat:'🐴 Trojan War', type:'pick4', e:'🦶', col:'#7bed9f',
+    q:'Which nearly-invincible Greek warrior had one weak spot — his heel?',
+    sub:'We still use his name for a "weak point" today',
+    hint:'"___\' heel" is now a common phrase…',
+    opts:['Odysseus','Achilles','Hercules','Perseus'], c:1,
+    ok:'🦶 ACHILLES! His only weak point was his heel — we still say "Achilles\' heel" today!',
+    err:'ACHILLES — nearly invincible except for his heel, giving us the phrase "Achilles\' heel"!' },
+  { cat:'🐴 Trojan War', type:'type', e:'👑', col:'#7bed9f',
+    q:'What was the name of the beautiful queen the Trojan War was fought over?',
+    sub:'Considered the most beautiful woman in the world',
+    hint:'Also a common girl\'s name today…',
+    accept:['helen','helen of troy'],
+    ok:'👑 HELEN! Also known as "Helen of Troy" — the war began when Paris took her from Greece!',
+    err:'HELEN (of Troy) — the war began because of her!' },
+  { cat:'🐍 Monsters', type:'type', e:'🐍', col:'#f72585',
+    q:'Which monster had living snakes for hair and could turn people to stone with a look?',
+    sub:'Perseus defeated her using a reflective shield',
+    hint:'Starts with "Med"…',
+    accept:['medusa'],
+    ok:'🐍 MEDUSA! Perseus defeated her by looking only at her reflection!',
+    err:'MEDUSA — anyone who looked at her directly turned to stone!' },
+  { cat:'🐍 Monsters', type:'pick4', e:'🐂', col:'#f72585',
+    q:'The Minotaur (half man, half bull) lived inside what kind of structure?',
+    sub:'So confusing, no one could find their way out',
+    hint:'Theseus used string to find his way back…',
+    opts:['A castle','A maze called the Labyrinth','A cave system','A tower'], c:1,
+    ok:'🐂 The LABYRINTH! An impossibly confusing maze — Theseus used string to escape it!',
+    err:'The LABYRINTH — a maze so confusing, string was needed to find the way out!' },
+  { cat:'🐍 Monsters', type:'pick4', e:'☀️', col:'#f72585',
+    q:'Why did Icarus fall from the sky?',
+    sub:'His father warned him about this exact danger',
+    hint:'Think about wax and heat…',
+    opts:['His wings were too heavy','He flew too close to the sun and the wax wings melted','A bird attacked him','He ran out of energy'], c:1,
+    ok:'☀️ He flew too close to the SUN, and the wax holding his wings together melted!',
+    err:'He flew too close to the SUN — the wax in his wings melted, just as his father warned!' },
+  { cat:'🐍 Monsters', type:'type', e:'📦', col:'#f72585',
+    q:'What phrase do we still use today, from the myth of a woman who opened a box she was told never to open?',
+    sub:'Two words: "____\'s box"',
+    hint:'Her name starts with P…',
+    accept:['pandoras box',"pandora's box",'pandora box'],
+    ok:'📦 PANDORA\'S BOX! We still say this when someone releases lots of unexpected trouble!',
+    err:'PANDORA\'S BOX — releasing every trouble in the world when curiosity won!' },
+  { cat:'🏃 Olympics', type:'type', e:'🏃', col:'#90e0ef',
+    q:'In what year BC were the first Olympic Games held?\n(hint: a 3-digit number)',
+    sub:'Nearly 2,800 years ago!',
+    hint:'Somewhere in the high 700s…',
+    accept:['776'],
+    ok:'🏃 776 BC! The first recorded Olympic Games, held in Olympia!',
+    err:'776 BC — the very first Olympic Games!' },
+  { cat:'🏃 Olympics', type:'pick4', e:'🫣', col:'#90e0ef',
+    q:'What surprising rule did ancient Olympic athletes follow?',
+    sub:'Definitely different from today!',
+    hint:'Think about their clothing…',
+    opts:['They wore golden armour','They competed completely naked','They had to be over 40','They competed at night'], c:1,
+    ok:'🫣 They competed completely NAKED! The word "gymnastics" even comes from the Greek for "naked"!',
+    err:'They competed completely NAKED — giving us the word "gymnastics"!' },
+  { cat:'🏃 Olympics', type:'pick4', e:'🌿', col:'#90e0ef',
+    q:'What prize did ancient Olympic champions receive?',
+    sub:'Not a medal!',
+    hint:'A plant-based crown…',
+    opts:['A gold medal','An olive wreath crown','A trophy cup','Money'], c:1,
+    ok:'🌿 An OLIVE WREATH crown! Simple, but an enormous honour!',
+    err:'An OLIVE WREATH crown — no medals in ancient Greece!' },
+  { cat:'🏃 Olympics', type:'pick4', e:'🕊️', col:'#90e0ef',
+    q:'What special agreement let athletes travel safely to the Olympics, even during wartime?',
+    sub:'A pause in fighting',
+    hint:'Two words, starts with "Olympic"…',
+    opts:['The Olympic Truce','The Peace Treaty','The Athens Accord','The Greek Pact'], c:0,
+    ok:'🕊️ The OLYMPIC TRUCE! Even warring city-states paused fighting for the games!',
+    err:'The OLYMPIC TRUCE — wars were paused so athletes could compete safely!' },
+  { cat:'🗳️ Democracy', type:'type', e:'🗳️', col:'#c77dff',
+    q:'What word, meaning "rule by the people," did the Ancient Greeks invent?',
+    sub:'We still use this system of government today',
+    hint:'Demo (people) + kratia (rule/power)…',
+    accept:['democracy'],
+    ok:'🗳️ DEMOCRACY! Athens\' huge gift to the whole world — though only some people could vote back then.',
+    err:'DEMOCRACY — invented in Athens, meaning "rule by the people"!' },
+  { cat:'🗳️ Democracy', type:'pick4', e:'⚠️', col:'#c77dff',
+    q:'Who was ALLOWED to vote in Ancient Athenian democracy?',
+    sub:'Very different rules from today!',
+    hint:'Not women, not foreigners, not enslaved people…',
+    opts:['Everyone, including women','Only free adult men born in Athens','Only the very rich','Only soldiers'], c:1,
+    ok:'⚠️ Only FREE ADULT MEN born in Athens! Women, foreigners and enslaved people could not vote.',
+    err:'Only free adult MEN born in Athens could vote — very different from democracy today!' },
+  { cat:'🗳️ Democracy', type:'pick4', e:'🤔', col:'#c77dff',
+    q:'Which famous philosopher was put on trial and sentenced to death for asking too many difficult questions?',
+    sub:'He calmly accepted his fate',
+    hint:'His student was Plato…',
+    opts:['Aristotle','Pythagoras','Socrates','Homer'], c:2,
+    ok:'🤔 SOCRATES! Sentenced to death for "corrupting young minds" with his questions.',
+    err:'SOCRATES — famous for endless questioning, which led to his death sentence!' },
+  { cat:'🗳️ Daily Life', type:'pick4', e:'🏺', col:'#c77dff',
+    q:'What was the bustling marketplace at the heart of a Greek city called?',
+    sub:'For shopping, politics and gossip!',
+    hint:'Starts with "A"…',
+    opts:['The Forum','The Agora','The Bazaar','The Stoa'], c:1,
+    ok:'🏺 The AGORA! The buzzing heart of every Greek city!',
+    err:'The AGORA — the marketplace and social heart of a Greek city!' },
+  { cat:'🗳️ Daily Life', type:'pick4', e:'⚔️', col:'#c77dff',
+    q:'At what age did Spartan boys leave home to begin military training?',
+    sub:'Much younger than school age today!',
+    hint:'Younger than most of David\'s Year 4 class…',
+    opts:['At 16','At 12','At 7','At 18'], c:2,
+    ok:'⚔️ At just 7 YEARS OLD! Spartan life was built entirely around military strength.',
+    err:'At just 7 YEARS OLD — Spartan boys began tough military training very young!' },
+  { cat:'🏛️ Legacy', type:'type', e:'🏃', col:'#ffc107',
+    q:'A messenger supposedly ran 25 miles to deliver news of a battle victory, giving us the name of which race today?',
+    sub:'Named after the battle site',
+    hint:'A very long modern running race…',
+    accept:['marathon'],
+    ok:'🏃 The MARATHON! Named after the Battle of Marathon and that legendary run!',
+    err:'The MARATHON — named after the battle, and the messenger\'s legendary run!' },
+  { cat:'🏛️ Legacy', type:'pick4', e:'📐', col:'#ffc107',
+    q:'Which Greek mathematician is said to have shouted "Eureka!" while jumping out of his bathtub?',
+    sub:'He had a sudden brilliant idea!',
+    hint:'Also famous for a triangle theorem — wait, that\'s the OTHER one…',
+    opts:['Pythagoras','Archimedes','Aristotle','Homer'], c:1,
+    ok:'📐 ARCHIMEDES! He shouted "Eureka!" (I found it!) after a sudden scientific discovery!',
+    err:'ARCHIMEDES — famous for shouting "Eureka!" after a bathtub discovery!' },
+  { cat:'🏛️ Grand Finale!', type:'type', e:'🏆', col:'#ffc107',
+    q:'In what YEAR were the modern Olympic Games revived, almost 1,500 years after the ancient games stopped?',
+    sub:'A famous 4-digit year',
+    hint:'Late 1800s…',
+    accept:['1896'],
+    ok:'🏆 1896! The modern Olympics began — directly inspired by everything you just learned! You\'re a true expert now, David! 🏛️',
+    err:'1896 — when the modern Olympic Games began, reviving the ancient tradition!' },
+];
+
+let chIdx=0, seenChs=new Set([0]);
+let qIdx=0, score=0, streak=0, bestStreak=0, correctCount=0, answered=false, hintShown=false;
+
+const APP_ID='greeks', APP_LABEL='Ancient Greeks';
+function recordSession(score,maxScore,extra){
+  try{
+    const key='david-stats-v1';
+    const rec={app:APP_ID,appLabel:APP_LABEL,date:new Date().toISOString(),score,maxScore,pct:maxScore?score/maxScore:0,extra:extra||{}};
+    const existing=JSON.parse(localStorage.getItem(key)||'[]');
+    existing.push(rec);
+    if(existing.length>300) existing.splice(0,existing.length-300);
+    localStorage.setItem(key,JSON.stringify(existing));
+  }catch(e){}
+}
+
+function normalizeAns(s){
+  return String(s).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s.]/g,'')
+    .replace(/\b(the|a|an|river|mount|mt|lake|ocean|sea)\b/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function fuzzyMatch(val,accept){
+  const nv=normalizeAns(val);
+  return accept.some(a=>{
+    const na=normalizeAns(a);
+    if(nv===na) return true;
+    const numeric = /^[0-9.,]+$/.test(na) || /^[0-9.,]+$/.test(nv);
+    if(numeric) return false;
+    return (nv.length>2 && na.includes(nv)) || (na.length>2 && nv.includes(na));
+  });
+}
+
+const flEl=document.getElementById('floaters');
+const fIcons=['🏛️','⚡','🦁','🐴','🐍','🏃','🗳️','🏺','🦉','⚔️','🌊','🔱','🎭','📐','🍇','👑'];
+for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=fIcons[Math.floor(Math.random()*fIcons.length)];s.style.left=(Math.random()*100)+'%';s.style.fontSize=(.9+Math.random()*1.3)+'rem';s.style.animationDuration=(9+Math.random()*13)+'s';s.style.animationDelay=(Math.random()*10)+'s';flEl.appendChild(s);}
+
+function buildDots(){
+  const dc=document.getElementById('chDots'); dc.innerHTML='';
+  chapters.forEach((ch,i)=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(i===chIdx?' active':seenChs.has(i)?' done':'');
+    d.textContent=ch.emoji;
+    d.onclick=()=>{chIdx=i;seenChs.add(i);buildDots();renderCh();};
+    dc.appendChild(d);
+  });
+}
+
+function buildGodGrid(){
+  const grid=document.getElementById('godGrid');
+  if(!grid) return;
+  grid.innerHTML='';
+  gods.forEach(g=>{
+    const card=document.createElement('div');
+    card.className='god-card';
+    card.innerHTML=`<div class="god-inner">
+      <div class="god-front"><span class="ge">${g.e}</span><span class="gn">${g.n}</span></div>
+      <div class="god-back"><span class="gd">${g.d}</span></div>
+    </div>`;
+    card.onclick=()=>card.classList.toggle('flipped');
+    grid.appendChild(card);
+  });
+}
+
+function renderCh(){
+  const ch=chapters[chIdx];
+  const isLast=chIdx===chapters.length-1;
+  const area=document.getElementById('chArea');
+  area.innerHTML=`<div class="ch-card" id="chCard">
+    <div class="ch-num">Chapter ${chIdx+1} of ${chapters.length}</div>
+    <div class="ch-title">${ch.emoji} ${ch.title}</div>
+    ${ch.content}
+    <div class="ch-nav">
+      ${chIdx>0?`<button class="ch-btn ch-prev" onclick="moveCh(-1)">⬅️ Back</button>`:''}
+      ${!isLast
+        ?`<button class="ch-btn ch-next" onclick="moveCh(1)">Next Chapter ➡️</button>`
+        :`<button class="ch-btn ch-quiz" onclick="goQuiz()">⚡ Ready — Quiz me!</button>`}
+    </div>
+  </div>`;
+  buildGodGrid();
+  const card=document.getElementById('chCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function moveCh(dir){
+  chIdx=Math.max(0,Math.min(chapters.length-1,chIdx+dir));
+  seenChs.add(chIdx); buildDots(); renderCh();
+}
+
+function goLearn(){
+  document.getElementById('learnPhase').style.display='block';
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.add('active');
+  document.getElementById('tabQuiz').classList.remove('active');
+}
+
+function goQuiz(){
+  document.getElementById('learnPhase').style.display='none';
+  document.getElementById('quizPhase').style.display='block';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.remove('active');
+  document.getElementById('tabQuiz').classList.add('active');
+  qIdx=0; score=0; streak=0; bestStreak=0; correctCount=0; answered=false; hintShown=false;
+  document.getElementById('qhScore').textContent='0';
+  document.getElementById('qhStreak').textContent='0🔥';
+  renderQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQ(){
+  answered=false; hintShown=false;
+  const q=questions[qIdx];
+  document.getElementById('qhNum').textContent=`${qIdx+1}/${questions.length}`;
+  document.getElementById('progFill').style.width=((qIdx/questions.length)*100)+'%';
+  document.getElementById('qTypePill').textContent=q.type==='type'?'⌨️ TYPE IT':'🖱️ CHOOSE';
+  document.getElementById('qEmoji').textContent=q.e;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qSub').textContent=q.sub||'';
+
+  const tag=document.getElementById('qTag');
+  tag.textContent=q.cat; tag.style.color=q.col; tag.style.borderColor=q.col+'55'; tag.style.background=q.col+'12';
+
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  const hb=document.getElementById('hintBox'); hb.className='hint-box'; hb.textContent='💡 Tap for a hint';
+
+  const aa=document.getElementById('answerArea'); aa.innerHTML='';
+  if(q.type==='type'){
+    aa.innerHTML=`<div class="type-wrap">
+      <input class="type-input" id="typeIn" placeholder="Type your answer…" autocomplete="off" spellcheck="false"/>
+      <button class="submit-btn" id="subBtn" onclick="submitType()">✅ Check Answer</button>
+    </div>`;
+    const inp=document.getElementById('typeIn');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitType();});
+    setTimeout(()=>inp.focus(),100);
+  } else {
+    const grid=document.createElement('div');
+    grid.className=q.opts.length>4?'opts-6':'opts-4';
+    q.opts.forEach((opt,i)=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt;
+      btn.onclick=()=>pickOpt(i,btn); grid.appendChild(btn);
+    });
+    aa.appendChild(grid);
+  }
+  const card=document.getElementById('qCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+}
+
+function showHint(){
+  if(hintShown||answered)return;
+  hintShown=true;
+  const hb=document.getElementById('hintBox');
+  hb.className='hint-box shown'; hb.textContent='💡 Hint: '+questions[qIdx].hint;
+}
+
+function submitType(){
+  if(answered)return;
+  const inp=document.getElementById('typeIn'), val=inp.value.trim();
+  if(!val){inp.focus();return;}
+  const q=questions[qIdx];
+  const correct=fuzzyMatch(val,q.accept);
+  inp.disabled=true; document.getElementById('subBtn').disabled=true;
+  inp.className='type-input '+(correct?'ok-in':'err-in');
+  processAns(correct,q);
+}
+
+function pickOpt(chosen,btn){
+  if(answered)return;
+  const q=questions[qIdx];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const correct=chosen===q.c;
+  if(correct) btn.classList.add('correct');
+  else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.c].classList.add('correct'); }
+  processAns(correct,q);
+}
+
+function processAns(correct,q){
+  answered=true;
+  const fb=document.getElementById('fb'); fb.style.display='block';
+  if(correct){
+    const pts=10+(streak>=2?5:0)+(!hintShown?3:0);
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak; correctCount++;
+    document.getElementById('qhScore').textContent=score;
+    document.getElementById('qhStreak').textContent=streak+'🔥';
+    fb.className='fb ok';
+    fb.textContent=q.ok+(streak>=3?` 🔥 ${streak} in a row!`:'')+(!hintShown?' ⭐ No-hint bonus!':'');
+  } else {
+    streak=0; document.getElementById('qhStreak').textContent='0🔥';
+    fb.className='fb err'; fb.textContent=q.err;
+  }
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=questions.length) showResults();
+  else renderQ();
+}
+
+function showResults(){
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('progFill').style.width='100%';
+
+  const rawPct = correctCount / questions.length;
+  recordSession(correctCount, questions.length, {rawScore:score});
+
+  let trophy,title,sub;
+  if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! Every single question right — you ARE a Greek mythology champion! 🏛️👑`;}
+  else if(rawPct>=.8){trophy='🥇';title='Olympian Expert, David!';sub=`${score} points! Outstanding knowledge of gods, heroes and history! 🔥`;}
+  else if(rawPct>=.6){trophy='🥈';title='Brilliant work, David!';sub=`${score} points! Really impressive knowledge! Go over the chapters and try again! 💪`;}
+  else if(rawPct>=.4){trophy='🏺';title='Good effort, David!';sub=`${score} points! Re-read the myths and try again — you'll smash it! 🚀`;}
+  else               {trophy='🦉';title='Keep going, David!';sub=`${score} points! Read every chapter carefully first, then try the quiz. You can do it! 💪`;}
+
+  document.getElementById('rTrophy').textContent=trophy;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rStars').textContent=rawPct>=1?'⭐⭐⭐⭐⭐':rawPct>=.8?'⭐⭐⭐⭐':rawPct>=.6?'⭐⭐⭐':rawPct>=.4?'⭐⭐':'⭐';
+
+  const fl2=document.getElementById('flList'); fl2.innerHTML='';
+  chapters.forEach(ch=>{
+    ch.facts.forEach(f=>{
+      const d=document.createElement('div'); d.className='fl-row';
+      d.innerHTML=`<span style="font-size:.9rem;flex-shrink:0">🏛️</span><span>${f}</span>`; fl2.appendChild(d);
+    });
+  });
+
+  const ml=document.getElementById('rMl');
+  if(rawPct>=.7){
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Incredible, David! Gods, heroes, monsters, history — you know Ancient Greece inside out! 🏛️👑</p>
+      <p class="ro">🇷🇴 Incredibil, David! Zei, eroi, monștri, istorie — cunoști Grecia Antică la perfecție! 🌟</p>
+      <p class="es">🇪🇸 ¡Increíble, David! ¡Dioses, héroes, monstruos, historia — conoces la Antigua Grecia a la perfección! 🏆</p>`;
+  } else {
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Good effort, David! Read the chapters again carefully then retake the quiz — you'll do much better! 💪</p>
+      <p class="ro">🇷🇴 Efort bun, David! Recitește capitolele cu atenție și încearcă din nou — vei reuși! 📚</p>
+      <p class="es">🇪🇸 ¡Buen esfuerzo, David! ¡Vuelve a leer los capítulos e inténtalo de nuevo! 🔄</p>`;
+  }
+  if(rawPct>=.6) launchConfetti();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function launchConfetti(){
+  const cols=['#ffc107','#7bed9f','#ff6b35','#f72585','#90e0ef','#c77dff','#e8d5b0'];
+  for(let i=0;i<90;i++){setTimeout(()=>{const c=document.createElement('div');c.className='cp';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(1.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);},i*20);}
+}
+
+buildDots(); renderCh();
+</script>
+</body>
+</html>
