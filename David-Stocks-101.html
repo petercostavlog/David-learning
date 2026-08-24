@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Guide to Stocks & Companies!</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060e06; --green:#52b788; --lime:#7bed9f; --amber:#ffc107;
+    --fire:#ff6b35; --bone:#e8d5b0; --red:#f72585; --sky:#90e0ef;
+    --purple:#c77dff; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;
+    background:radial-gradient(ellipse at 15% 20%,rgba(123,237,159,.13) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 80%,rgba(255,193,7,.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#060e06 0%,#020802 100%);}
+  .floaters{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .floaters span{position:absolute;opacity:.05;animation:floatUp linear infinite;}
+  @keyframes floatUp{0%{transform:translateY(105vh) rotate(0deg);opacity:0}5%{opacity:.05}95%{opacity:.05}100%{transform:translateY(-5vh) rotate(25deg);opacity:0}}
+
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:16px 14px 70px;}
+
+  .hdr{text-align:center;margin-bottom:20px;animation:dropIn .6s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes dropIn{from{transform:translateY(-44px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .hdr-badge{display:inline-block;background:rgba(123,237,159,.1);border:1.5px solid rgba(123,237,159,.3);border-radius:50px;padding:5px 16px;font-size:.78rem;font-weight:800;color:var(--lime);letter-spacing:.5px;margin-bottom:8px;}
+  .hdr h1{font-family:'Boogaloo',cursive;font-size:clamp(1.7rem,6vw,2.7rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800,0 0 30px rgba(255,193,7,.2);}
+  .hdr p{color:rgba(255,255,255,.4);font-weight:700;font-size:.86rem;margin-top:5px;}
+
+  .tabs{display:flex;gap:10px;margin-bottom:20px;animation:dropIn .5s .08s cubic-bezier(.34,1.56,.64,1) both;}
+  .tab{flex:1;padding:11px 6px;background:var(--card);border:2px solid var(--border);border-radius:16px;font-family:'Boogaloo',cursive;font-size:.92rem;color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;text-align:center;}
+  .tab.active{background:rgba(255,193,7,.12);border-color:var(--amber);color:var(--amber);box-shadow:0 0 16px rgba(255,193,7,.15);}
+  .tab:hover:not(.active){background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);}
+
+  .ch-dots{display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .cdot{width:36px;height:36px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:all .25s;}
+  .cdot.active{background:rgba(123,237,159,.2);border-color:var(--lime);transform:scale(1.2);box-shadow:0 0 12px rgba(123,237,159,.3);}
+  .cdot.done{background:rgba(255,193,7,.15);border-color:var(--amber);}
+
+  .ch-card{border-radius:26px;padding:28px 22px 22px;background:var(--card);border:2px solid rgba(123,237,159,.2);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  @keyframes cardIn{from{transform:scale(.9) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .ch-num{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(123,237,159,.6);margin-bottom:8px;}
+  .ch-title{font-family:'Boogaloo',cursive;font-size:clamp(1.4rem,4.5vw,2.05rem);color:var(--amber);margin-bottom:4px;text-shadow:1px 1px 0 #5a3800;}
+
+  .story{font-size:.95rem;color:rgba(255,255,255,.85);line-height:1.8;font-weight:600;margin-bottom:16px;}
+  .story strong{color:var(--amber);font-weight:900;}
+  .story em{color:var(--bone);font-style:normal;font-weight:800;}
+
+  .myth-box{background:rgba(123,237,159,.06);border:1.5px solid rgba(123,237,159,.25);border-radius:18px;padding:16px 18px;margin-bottom:16px;}
+  .myth-box .myth-title{font-family:'Boogaloo',cursive;color:var(--lime);font-size:1.1rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .myth-box p{font-size:.92rem;color:rgba(255,255,255,.85);line-height:1.75;font-weight:600;margin-bottom:8px;}
+  .myth-box p:last-child{margin-bottom:0;}
+  .myth-box strong{color:var(--amber);}
+
+  .facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .fbox{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 12px;}
+  .fbox .fi{font-size:1.8rem;display:block;margin-bottom:6px;}
+  .fbox .ft{font-family:'Boogaloo',cursive;font-size:.95rem;color:var(--amber);margin-bottom:4px;}
+  .fbox .fd{font-size:.78rem;color:rgba(255,255,255,.65);font-weight:700;line-height:1.5;}
+
+  .wow{background:rgba(255,107,53,.08);border:1.5px dashed rgba(255,107,53,.3);border-radius:14px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+  .wow .wi{font-size:1.4rem;flex-shrink:0;}
+  .wow .wt{font-size:.82rem;color:#ffb08a;font-weight:700;line-height:1.55;}
+  .wow .wt strong{color:var(--fire);}
+
+  .safety{background:rgba(144,224,239,.07);border:1.5px solid rgba(144,224,239,.3);border-radius:16px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+  .safety .si{font-size:1.5rem;flex-shrink:0;}
+  .safety .st{font-size:.85rem;color:#c9f1ff;font-weight:700;line-height:1.6;}
+  .safety .st strong{color:var(--sky);}
+
+  .price-demo{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0;flex-wrap:wrap;}
+  .price-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 18px;text-align:center;min-width:110px;}
+  .price-card .pe{font-size:1.8rem;}
+  .price-card .pl{font-size:.7rem;color:rgba(255,255,255,.5);font-weight:800;margin:4px 0;}
+  .price-card .pv{font-family:'Boogaloo',cursive;font-size:1.3rem;}
+  .price-arrow{font-size:1.6rem;}
+
+  .ch-nav{display:flex;gap:10px;margin-top:4px;}
+  .ch-btn{flex:1;padding:13px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.05rem;cursor:pointer;transition:all .2s;}
+  .ch-prev{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:2px solid var(--border);}
+  .ch-prev:hover{background:rgba(255,255,255,.12);color:white;}
+  .ch-next{background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .ch-next:hover{transform:translateY(-2px);}
+  .ch-quiz{background:linear-gradient(135deg,var(--lime),var(--green));color:#060e06;box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .ch-quiz:hover{transform:translateY(-2px);}
+
+  #quizPhase{display:none;}
+  .q-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .qhb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:10px 6px;text-align:center;}
+  .qhb .qhv{font-family:'Boogaloo',cursive;font-size:1.35rem;color:white;display:block;}
+  .qhb .qhl{font-size:.62rem;color:rgba(255,255,255,.35);font-weight:800;text-transform:uppercase;}
+
+  .prog-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:8px;margin-bottom:18px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--lime),var(--amber));transition:width .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px rgba(123,237,159,.4);}
+
+  .q-card{border-radius:26px;padding:26px 22px 22px;background:var(--card);border:2px solid var(--border);backdrop-filter:blur(8px);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:14px;}
+  .q-top{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .q-tag{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:1.5px solid;}
+  .q-type-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:800;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);}
+  .q-emoji-big{font-size:3rem;display:block;text-align:center;margin-bottom:10px;animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  .q-text{font-family:'Boogaloo',cursive;font-size:clamp(1.05rem,3.5vw,1.4rem);color:white;text-align:center;line-height:1.35;margin-bottom:8px;white-space:pre-line;}
+  .q-sub{font-size:.8rem;color:rgba(255,255,255,.4);text-align:center;font-weight:700;margin-bottom:14px;line-height:1.5;font-style:italic;}
+
+  .hint-box{background:rgba(255,193,7,.07);border:1.5px dashed rgba(255,193,7,.25);border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:.8rem;color:rgba(255,193,7,.7);font-weight:700;text-align:center;cursor:pointer;transition:all .2s;}
+  .hint-box:hover{background:rgba(255,193,7,.12);}
+  .hint-box.shown{cursor:default;color:var(--amber);border-style:solid;}
+
+  .opts-4{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .opts-6{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .opt{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:14px;padding:13px 8px;cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;color:white;text-align:center;line-height:1.3;}
+  .opt:hover:not(:disabled){background:rgba(82,183,136,.12);border-color:rgba(82,183,136,.4);transform:scale(1.03);}
+  .opt.correct{background:rgba(123,237,159,.22)!important;border-color:var(--lime)!important;animation:pop .35s cubic-bezier(.34,1.56,.64,1);}
+  .opt.wrong{background:rgba(247,37,133,.15)!important;border-color:var(--red)!important;animation:shk .3s ease;}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  .type-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .type-input{width:100%;max-width:400px;padding:14px 18px;background:rgba(255,255,255,.07);border:2.5px solid rgba(255,255,255,.18);border-radius:16px;font-family:'Boogaloo',cursive;font-size:1.4rem;color:white;text-align:center;outline:none;transition:all .2s;caret-color:var(--amber);}
+  .type-input::placeholder{color:rgba(255,255,255,.22);font-size:1rem;}
+  .type-input:focus{border-color:rgba(255,193,7,.6);box-shadow:0 0 20px rgba(255,193,7,.15);}
+  .type-input.ok-in{border-color:var(--lime);background:rgba(123,237,159,.08);}
+  .type-input.err-in{border-color:var(--red);background:rgba(247,37,133,.07);}
+  .submit-btn{padding:13px 34px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--amber),var(--fire));color:#060e06;box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .submit-btn:hover{transform:translateY(-2px);}
+  .submit-btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  .fb{border-radius:13px;padding:13px 16px;margin-top:13px;font-weight:700;font-size:.88rem;line-height:1.55;animation:fadeUp .3s ease both;display:none;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .fb.ok{background:rgba(123,237,159,.1);border:1.5px solid var(--lime);color:#b7f5c8;}
+  .fb.err{background:rgba(247,37,133,.08);border:1.5px solid var(--red);color:#ffaacc;}
+
+  .next-btn{display:none;width:100%;margin-top:12px;padding:14px;border:none;border-radius:50px;cursor:pointer;transition:all .2s;font-family:'Boogaloo',cursive;font-size:1.15rem;color:#060e06;background:linear-gradient(135deg,var(--amber),var(--fire));box-shadow:0 4px 16px rgba(255,193,7,.3);}
+  .next-btn:hover{transform:translateY(-2px);}
+
+  #resultsSection{display:none;text-align:center;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+  .r-trophy{font-size:5.5rem;display:block;margin-bottom:12px;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .r-title{font-family:'Boogaloo',cursive;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--amber);text-shadow:2px 2px 0 #5a3800;margin-bottom:6px;}
+  .r-sub{color:rgba(255,255,255,.5);font-weight:700;font-size:.95rem;margin-bottom:18px;}
+  .r-stars{font-size:2rem;letter-spacing:6px;margin-bottom:18px;}
+  .facts-learned{background:var(--card);border:1.5px solid rgba(123,237,159,.2);border-radius:18px;padding:16px;margin-bottom:16px;text-align:left;}
+  .facts-learned h3{font-family:'Boogaloo',cursive;color:var(--amber);font-size:1rem;margin-bottom:12px;}
+  .fl-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:700;line-height:1.45;}
+  .ml-box{background:rgba(255,255,255,.03);border:1.5px solid rgba(144,224,239,.15);border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.83rem;text-align:left;}
+  .ml-box p{margin-bottom:5px;line-height:1.55;}
+  .ml-box .en{color:var(--amber);font-weight:800;}
+  .ml-box .ro{color:var(--lime);font-weight:800;}
+  .ml-box .es{color:var(--sky);font-weight:800;}
+  .r-btns{display:flex;gap:10px;}
+  .r-btn{flex:1;padding:14px;border:none;border-radius:50px;font-family:'Boogaloo',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;color:#060e06;}
+  .r-btn-learn{background:rgba(255,255,255,.08);color:white;border:2px solid var(--border);}
+  .r-btn-learn:hover{background:rgba(255,255,255,.13);}
+  .r-btn-quiz{background:linear-gradient(135deg,var(--lime),var(--green));box-shadow:0 4px 16px rgba(123,237,159,.3);}
+  .r-btn-quiz:hover{transform:scale(1.03);}
+
+  .cp{position:fixed;width:9px;height:9px;top:-9px;border-radius:2px;animation:cf linear forwards;z-index:999;pointer-events:none;}
+  @keyframes cf{to{transform:translateY(106vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="floaters" id="floaters"></div>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-badge">🍋 STOCKS & COMPANIES — LEARN + QUIZ</div>
+    <h1>What Are Stocks? 📈</h1>
+    <p>Read all 7 chapters → then take the big quiz!</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabLearn" onclick="goLearn()">📖 Learn</button>
+    <button class="tab"        id="tabQuiz"  onclick="goQuiz()">⚡ Quiz Me!</button>
+  </div>
+
+  <div id="learnPhase">
+    <div class="ch-dots" id="chDots"></div>
+    <div id="chArea"></div>
+  </div>
+
+  <div id="quizPhase">
+    <div class="q-hud">
+      <div class="qhb"><span class="qhv" id="qhScore">0</span><span class="qhl">⭐ Score</span></div>
+      <div class="qhb"><span class="qhv" id="qhStreak">0🔥</span><span class="qhl">Streak</span></div>
+      <div class="qhb"><span class="qhv" id="qhNum">1/20</span><span class="qhl">Question</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="q-card" id="qCard">
+      <div class="q-top">
+        <span class="q-tag" id="qTag" style="color:var(--lime);border-color:var(--lime)55;background:var(--lime)12">🍋 Stocks</span>
+        <span class="q-type-pill" id="qTypePill">CHOOSE</span>
+      </div>
+      <span class="q-emoji-big" id="qEmoji">📈</span>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="q-sub"  id="qSub"></div>
+      <div class="hint-box" id="hintBox" onclick="showHint()">💡 Tap for a hint</div>
+      <div id="answerArea"></div>
+      <div class="fb" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">Next ➡️</button>
+    </div>
+  </div>
+
+  <div id="resultsSection">
+    <span class="r-trophy" id="rTrophy">🏆</span>
+    <div class="r-title" id="rTitle">Amazing, David!</div>
+    <div class="r-sub"   id="rSub"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="facts-learned">
+      <h3>📈 Everything you learned today:</h3>
+      <div id="flList"></div>
+    </div>
+    <div class="ml-box" id="rMl"></div>
+    <div class="r-btns">
+      <button class="r-btn r-btn-learn" onclick="goLearn()">📖 Review Lesson</button>
+      <button class="r-btn r-btn-quiz"  onclick="goQuiz()">🔄 Try Quiz Again!</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const chapters = [
+  {
+    emoji:'🍋', title:'What Is a Company?',
+    content:`
+      <div class="myth-box">
+        <div class="myth-title">📖 David's Lemonade Stand</div>
+        <p>Imagine David decides to sell lemonade outside his house. He buys lemons, sugar and cups, makes
+        delicious lemonade, and sells each cup for 50p. People walk by, buy a cup, and David earns money.</p>
+        <p>Congratulations — David just started a <strong>company</strong>! A company is simply a business
+        that makes or sells something (a product or a service) in order to earn money.</p>
+      </div>
+      <p class="story">Companies come in ALL sizes. Some are tiny, like a single lemonade stand. Others are
+      absolutely massive, employing hundreds of thousands of people and selling things to millions of
+      customers all around the world — like the company that makes your favourite trainers, or the one that
+      made the last film you watched at the cinema!</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🏭</span><div class="ft">Makes Something</div><div class="fd">A company creates a product (like phones, toys, or lemonade) or offers a service (like fixing cars).</div></div>
+        <div class="fbox"><span class="fi">💰</span><div class="ft">Earns Money</div><div class="fd">When people buy what the company sells, the company earns money — called "profit" if it's more than it cost to make.</div></div>
+        <div class="fbox"><span class="fi">👥</span><div class="ft">Employs People</div><div class="fd">Bigger companies hire lots of people to help make and sell things — designers, builders, drivers and more!</div></div>
+        <div class="fbox"><span class="fi">🌍</span><div class="ft">Big or Small</div><div class="fd">From a lemonade stand to a company with offices in 100 countries — they're all companies!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">The biggest companies in the world are worth <strong>trillions of pounds</strong> — that's a 1 followed by TWELVE zeros! They started small too, sometimes in someone's garage!</div></div>`,
+    facts:['A company is a business that makes or sells something to earn money','Companies can be tiny (a lemonade stand) or huge (worldwide brands)','When a company earns more than it spends, that extra money is called "profit"','Some of the biggest companies started in someone\'s garage!']
+  },
+  {
+    emoji:'🍕', title:'What Is a "Share"?',
+    content:`
+      <div class="myth-box">
+        <div class="myth-title">📖 David Needs Help Growing</div>
+        <p>David's lemonade is so popular that he wants a bigger stand, a cool sign, and enough lemons to sell
+        ALL day. But he doesn't have enough money to buy all that himself.</p>
+        <p>So David has a clever idea: he asks his friend Amy for £10 to help. In return, David says: <em>"If
+        you give me £10 now, you'll own a small PIECE of my lemonade stand forever — and whenever the stand
+        makes money, I'll share some of it with you too!"</em></p>
+        <p>Amy agrees. She now owns a tiny slice of David's company. That tiny slice is called a
+        <strong>share</strong> (also called a "stock")!</p>
+      </div>
+      <p class="story">A share is simply <strong>a small piece of ownership in a company</strong>. If you own
+      a share of a company, you own a tiny fraction of everything that company has and earns — even if the
+      company is enormous and you only own a very, very tiny piece of it!</p>
+      <div class="wow"><span class="wi">🍕</span><div class="wt">Think of a company like a giant pizza. A "share" is just <strong>one slice</strong> of that pizza. Huge companies cut their pizza into BILLIONS of tiny slices, so everyday people can afford to own just one or two slices!</div></div>`,
+    facts:['A "share" (or "stock") is a small piece of ownership in a company','People can buy shares to help a company get money to grow','Owning a share means owning a tiny fraction of that whole company','Big companies split ownership into billions of tiny shares, so anyone can afford one']
+  },
+  {
+    emoji:'🏢', title:'Real Companies You Might Know',
+    content:`
+      <p class="story">Believe it or not, you can actually buy a tiny share of some of the biggest, most
+      famous companies in the world — ones you probably use or watch every single day!</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🏰</span><div class="ft">Disney</div><div class="fd">Makes the films, shows and theme parks you love — and you can own a tiny piece of it!</div></div>
+        <div class="fbox"><span class="fi">👟</span><div class="ft">Nike</div><div class="fd">Designs and sells trainers and sportswear worn by people (and athletes!) all over the world.</div></div>
+        <div class="fbox"><span class="fi">🍔</span><div class="ft">McDonald's</div><div class="fd">One of the most famous restaurant companies on the planet, with restaurants in over 100 countries!</div></div>
+        <div class="fbox"><span class="fi">📱</span><div class="ft">Apple</div><div class="fd">Makes iPhones, iPads and computers used by over a billion people worldwide.</div></div>
+      </div>
+      <p class="story">When grown-ups buy a share of Disney, for example, they now own a genuine (though tiny!)
+      piece of the actual Walt Disney Company — the same company that made every Disney film ever!</p>
+      <div class="wow"><span class="wi">🎬</span><div class="wt">If enough people around the world each own a small slice, together they technically own the WHOLE company — even though no single person owns all of it! That's how huge companies like Disney or Apple are owned.</div></div>`,
+    facts:['You can own tiny shares of huge, famous companies like Disney, Nike, Apple and McDonald\'s','Owning a share means owning a real (if tiny) piece of that actual company','Millions of people can each own a small slice of the same giant company','Together, all the shareholders technically own the whole company']
+  },
+  {
+    emoji:'📈', title:'What Is the Stock Market?',
+    content:`
+      <p class="story">Once David starts giving out shares of his lemonade stand, what if Amy later wants her
+      money back — but David's stand is still running? Amy can't just "un-invest" — instead, she needs to find
+      <strong>someone else</strong> who wants to buy her share from her!</p>
+      <div class="myth-box">
+        <div class="myth-title">🏪 A Giant Marketplace for Company Slices</div>
+        <p>That's exactly what the <strong>stock market</strong> is — a huge marketplace where people buy and
+        sell tiny shares of companies, all day, every weekday. Instead of a physical market with stalls, it
+        mostly happens on computers now, connecting buyers and sellers from all around the world in an
+        instant!</p>
+      </div>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🏛️</span><div class="ft">Stock Exchanges</div><div class="fd">Famous marketplaces like the New York Stock Exchange or the London Stock Exchange, where millions of shares trade every day!</div></div>
+        <div class="fbox"><span class="fi">💻</span><div class="ft">Mostly Digital</div><div class="fd">Today, almost all buying and selling happens instantly through computers, not people shouting on a trading floor!</div></div>
+        <div class="fbox"><span class="fi">🌐</span><div class="ft">Open to (Almost) Everyone</div><div class="fd">With a grown-up's help, families can buy small pieces of big companies too — not just huge banks!</div></div>
+        <div class="fbox"><span class="fi">⏰</span><div class="ft">Set Hours</div><div class="fd">Stock markets open and close at set times on business days — they're not open 24 hours a day!</div></div>
+      </div>
+      <div class="wow"><span class="wi">🤯</span><div class="wt">Every single weekday, people around the world buy and sell <strong>trillions of pounds</strong> worth of company shares — all through computers, in the blink of an eye!</div></div>`,
+    facts:['The stock market is a giant marketplace for buying and selling company shares','Famous stock exchanges include the New York and London Stock Exchanges','Today, nearly all trading happens digitally through computers','Trillions of pounds worth of shares trade hands every single weekday']
+  },
+  {
+    emoji:'🤔', title:'Why Do People Buy Shares?',
+    content:`
+      <p class="story">Why would Amy want to give David £10 for a slice of a lemonade stand in the first
+      place? There are two main reasons people buy shares of a company:</p>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">🌱</span><div class="ft">1. They Believe It Will Grow</div><div class="fd">If Amy believes David's lemonade stand will become more popular and valuable over time, her tiny share becomes worth more too!</div></div>
+        <div class="fbox"><span class="fi">🎁</span><div class="ft">2. Sharing the Profit</div><div class="fd">Some companies say "thank you" to their shareholders by sharing a slice of their profit with them. This is called a "dividend"!</div></div>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">📈 David's Stand Gets Famous</div>
+        <p>A year later, David's lemonade stand has become the most popular one in town — he even opened a
+        second stand! Because the business grew, Amy's original tiny share is now worth much more than the
+        £10 she first paid. If she wanted to, she could sell her share to someone else for more money than she
+        paid — but she also might choose to KEEP it, believing it will keep growing even more!</p>
+      </div>
+      <div class="wow"><span class="wi">💡</span><div class="wt">This is the basic idea behind almost all investing: people give money to companies they believe in, hoping that company grows and becomes more valuable over time — sharing that growth with everyone who owns a piece!</div></div>`,
+    facts:['People buy shares hoping the company grows and becomes more valuable','Some companies share their profit with owners — called a "dividend"','A share\'s value can go up if the company does well and grows','Investors can choose to sell their shares, or keep them for even longer']
+  },
+  {
+    emoji:'🎢', title:'Why Do Prices Go Up and Down?',
+    content:`
+      <p class="story">You've probably noticed toy prices go up right before Christmas when everyone wants the
+      same popular toy — that's exactly how share prices work too!</p>
+      <div class="price-demo">
+        <div class="price-card"><span class="pe">😀😀😀</span><div class="pl">LOTS OF BUYERS</div><div class="pv" style="color:var(--lime)">Price UP! 📈</div></div>
+        <div class="price-arrow">⚡</div>
+        <div class="price-card"><span class="pe">😐</span><div class="pl">FEW BUYERS</div><div class="pv" style="color:var(--red)">Price DOWN! 📉</div></div>
+      </div>
+      <div class="facts-grid">
+        <div class="fbox"><span class="fi">📣</span><div class="ft">Supply & Demand</div><div class="fd">If LOTS of people want to buy a share, but few people want to sell, the price goes UP. If more people want to sell than buy, it goes DOWN.</div></div>
+        <div class="fbox"><span class="fi">📰</span><div class="ft">Company News</div><div class="fd">Exciting news (like a hit new product) often makes a share price rise. Bad news can make it fall.</div></div>
+        <div class="fbox"><span class="fi">😊</span><div class="ft">How People Feel</div><div class="fd">If people feel excited and hopeful about a company's future, more want to buy — pushing the price up!</div></div>
+        <div class="fbox"><span class="fi">🌍</span><div class="ft">The Wider World</div><div class="fd">Even big world events (weather, new inventions, the economy) can affect how people feel about companies.</div></div>
+      </div>
+      <div class="wow"><span class="wi">🎢</span><div class="wt">Share prices can change MANY times in a single day — up a little, down a little — like a gentle roller coaster! This is completely normal, even for successful companies.</div></div>`,
+    facts:['Share prices go up when more people want to buy than sell','Share prices go down when more people want to sell than buy','Company news (good or bad) can affect how much people want a share','Share prices naturally move up and down often — even for great companies']
+  },
+  {
+    emoji:'🧠', title:'Being Smart, Patient & Safe',
+    content:`
+      <p class="story">Here's the most important chapter of all — because understanding stocks also means
+      understanding how to think about them wisely.</p>
+      <div class="safety">
+        <span class="si">⚠️</span>
+        <div class="st"><strong>Shares can also LOSE value.</strong> Just like David's lemonade stand could become less popular, real companies can struggle too — meaning shares can go down and even stay down for a while. Nobody can promise a share will always go up!</div>
+      </div>
+      <div class="safety">
+        <span class="si">🐢</span>
+        <div class="st"><strong>Smart investors are patient.</strong> They don't panic when a price dips for a day or a week. They think in YEARS, not days — like planting a tree and waiting patiently for it to grow tall.</div>
+      </div>
+      <div class="safety">
+        <span class="si">🚫</span>
+        <div class="st"><strong>This is NOT a game of luck.</strong> Buying shares isn't like a lottery ticket or gambling — wise investors do their research and only ever invest money they don't need right away, never money meant for important things.</div>
+      </div>
+      <div class="myth-box">
+        <div class="myth-title">🍋 Why Daddy Studies Companies</div>
+        <p>This is exactly why grown-ups who work with stocks — like a trader — spend so much time studying
+        companies, reading news, and thinking carefully before buying or selling. It takes patience, research
+        and a cool head, not guessing or rushing!</p>
+      </div>
+      <p class="story">Now you understand what companies and shares really are, why the stock market exists,
+      and — most importantly — how to think about it wisely, just like a smart, patient investor! 🍋📈</p>`,
+    facts:['Share prices can go DOWN as well as up — nothing is guaranteed','Smart, patient investors think in years, not days','Investing isn\'t gambling — it involves research and careful thinking','People who work with stocks study companies carefully before deciding']
+  }
+];
+
+const questions = [
+  { cat:'🍋 Companies', type:'type', e:'🏭', col:'#7bed9f',
+    q:'What do we call a business that makes or sells something to earn money?',
+    sub:'David\'s lemonade stand is a small example',
+    hint:'Starts with C…',
+    accept:['company','a company'],
+    ok:'🍋 A COMPANY! Any business that makes or sells something to earn money.',
+    err:'A COMPANY — a business that makes or sells something to earn money!' },
+  { cat:'🍋 Companies', type:'pick4', e:'💰', col:'#7bed9f',
+    q:'What do we call the extra money a company earns after paying all its costs?',
+    sub:'The goal of most businesses',
+    hint:'Starts with P…',
+    opts:['Profit','Salary','Interest','Tax'], c:0,
+    ok:'💰 PROFIT! The extra money left over after paying for everything the business needed.',
+    err:'PROFIT — the money left over after a company pays its costs!' },
+  { cat:'🍋 Companies', type:'pick4', e:'🌍', col:'#7bed9f',
+    q:'Companies can be…',
+    sub:'Think about David\'s stand vs a worldwide brand',
+    hint:'Both are true!',
+    opts:['Only tiny, like a lemonade stand','Only huge, worldwide businesses','Any size — tiny OR huge!','Always run by just one person'], c:2,
+    ok:'🌍 ANY SIZE! From a lemonade stand to a company in 100 countries!',
+    err:'Companies can be ANY SIZE — tiny like a lemonade stand, or huge like a worldwide brand!' },
+  { cat:'🍕 Shares', type:'type', e:'🍕', col:'#ffc107',
+    q:'What do we call a small piece of ownership in a company?',
+    sub:'David gave Amy one of these for her £10',
+    hint:'Also called a "stock"…',
+    accept:['share','a share','stock','a stock'],
+    ok:'🍕 A SHARE (or "stock")! A small piece of ownership in a company.',
+    err:'A SHARE (also called a "stock") — a small piece of ownership in a company!' },
+  { cat:'🍕 Shares', type:'pick4', e:'🤝', col:'#ffc107',
+    q:'In the story, why did David give Amy a share of his lemonade stand?',
+    sub:'David needed something from her',
+    hint:'Think about what he needed to grow the stand…',
+    opts:['She was his best friend','She gave him money to help the stand grow','She made the lemonade','She was older than him'], c:1,
+    ok:'🤝 She gave him MONEY to help the business grow — and got a tiny piece of ownership in return!',
+    err:'Amy gave David MONEY to help his stand grow, and got a small share of ownership in return!' },
+  { cat:'🍕 Shares', type:'pick4', e:'🍕', col:'#ffc107',
+    q:'If a company is like a giant pizza, what is a "share"?',
+    sub:'Remember the pizza comparison?',
+    hint:'A small part of the whole pizza…',
+    opts:['The whole pizza','One slice of the pizza','The pizza box','The topping'], c:1,
+    ok:'🍕 ONE SLICE! Huge companies split their "pizza" into billions of tiny slices!',
+    err:'ONE SLICE of the pizza — that\'s exactly what a share is!' },
+  { cat:'🏢 Real Companies', type:'pick4', e:'🏰', col:'#c77dff',
+    q:'Which of these is a real company you could technically own a tiny share of?',
+    sub:'All 4 are real, but this one makes films and owns theme parks',
+    hint:'Think Mickey Mouse…',
+    opts:['Disney','Hogwarts','Narnia','Wonderland'], c:0,
+    ok:'🏰 DISNEY! A real company that makes films, shows and theme parks!',
+    err:'DISNEY — a real company you could own a tiny share of!' },
+  { cat:'🏢 Real Companies', type:'pick4', e:'👟', col:'#c77dff',
+    q:'Which famous company designs and sells trainers and sportswear worldwide?',
+    sub:'Just do it!',
+    hint:'A checkmark-shaped logo…',
+    opts:['McDonald\'s','Apple','Nike','Disney'], c:2,
+    ok:'👟 NIKE! Designs and sells sportswear and trainers all over the world!',
+    err:'NIKE — famous for trainers and sportswear worldwide!' },
+  { cat:'🏢 Real Companies', type:'pick4', e:'📱', col:'#c77dff',
+    q:'If a million different people each own a small slice of a company like Apple, who owns the whole company?',
+    sub:'Think about it carefully!',
+    hint:'Not just one single person…',
+    opts:['Only the founder','The government','Together, all the shareholders','Nobody owns it'], c:2,
+    ok:'📱 Together, ALL the shareholders own the whole company — even though no single person owns it all!',
+    err:'Together, ALL the shareholders (owners of shares) own the whole company between them!' },
+  { cat:'📈 Stock Market', type:'type', e:'📈', col:'#90e0ef',
+    q:'What do we call the giant marketplace where people buy and sell company shares?',
+    sub:'Two words, starts with "stock"',
+    hint:'Stock ___…',
+    accept:['stock market','the stock market'],
+    ok:'📈 The STOCK MARKET! A giant marketplace for buying and selling shares.',
+    err:'The STOCK MARKET — a giant marketplace for company shares!' },
+  { cat:'📈 Stock Market', type:'pick4', e:'💻', col:'#90e0ef',
+    q:'How does most stock trading happen today?',
+    sub:'Not like an old-fashioned market with stalls!',
+    hint:'Think about screens and the internet…',
+    opts:['People shouting in a big room','Mostly through computers, instantly','By writing letters','Only once a year'], c:1,
+    ok:'💻 Mostly through COMPUTERS, connecting buyers and sellers instantly!',
+    err:'Mostly through COMPUTERS — buying and selling happens instantly online today!' },
+  { cat:'📈 Stock Market', type:'pick4', e:'🏛️', col:'#90e0ef',
+    q:'Which of these is a real, famous stock exchange?',
+    sub:'Where millions of shares trade every day',
+    hint:'Named after a huge American city…',
+    opts:['The New York Stock Exchange','The Moon Exchange','The Lemonade Exchange','The Toy Exchange'], c:0,
+    ok:'🏛️ The NEW YORK STOCK EXCHANGE! One of the most famous stock exchanges in the world.',
+    err:'The NEW YORK STOCK EXCHANGE — a real, famous marketplace for shares!' },
+  { cat:'🤔 Why Buy?', type:'pick4', e:'🌱', col:'#7bed9f',
+    q:'What is one main reason people buy shares of a company?',
+    sub:'Thinking about the future',
+    hint:'Hoping the company will do this…',
+    opts:['They believe it will grow and become more valuable','They want free lemonade','It\'s required by law','They enjoy paperwork'], c:0,
+    ok:'🌱 They believe the company will GROW and become more valuable over time!',
+    err:'They believe the company will GROW and become more valuable — that\'s a key reason people buy shares!' },
+  { cat:'🤔 Why Buy?', type:'type', e:'🎁', col:'#7bed9f',
+    q:'What is the word for when a company shares some of its profit with the people who own shares?',
+    sub:'A company\'s way of saying "thank you"',
+    hint:'Starts with D…',
+    accept:['dividend','a dividend','dividends'],
+    ok:'🎁 A DIVIDEND! When a company shares profit with its shareholders.',
+    err:'A DIVIDEND — when a company shares some of its profit with shareholders!' },
+  { cat:'🎢 Prices', type:'pick4', e:'📈', col:'#ffc107',
+    q:'If LOTS of people want to buy a company\'s shares, but few want to sell, what usually happens to the price?',
+    sub:'Think about a popular toy at Christmas',
+    hint:'More demand than supply means…',
+    opts:['It goes up','It goes down','It stays exactly the same','It disappears'], c:0,
+    ok:'📈 It goes UP! More buyers than sellers usually pushes the price higher.',
+    err:'The price usually goes UP when there are more buyers than sellers!' },
+  { cat:'🎢 Prices', type:'pick4', e:'📉', col:'#ffc107',
+    q:'What might make a company\'s share price go DOWN?',
+    sub:'Think about how people might react',
+    hint:'The opposite of exciting news…',
+    opts:['A hit new product launch','Bad news about the company','Everyone loving the brand','Lots of people wanting to buy'], c:1,
+    ok:'📉 BAD NEWS about a company can make more people want to sell, pushing the price down.',
+    err:'BAD NEWS about a company can push the price DOWN, as more people want to sell!' },
+  { cat:'🎢 Prices', type:'pick4', e:'🎢', col:'#ffc107',
+    q:'How often can a share price change during a single day?',
+    sub:'Think about how busy the stock market is',
+    hint:'Very frequently!',
+    opts:['Never — it\'s fixed forever','Once a year only','Many times — like a gentle roller coaster','Only on Fridays'], c:2,
+    ok:'🎢 MANY TIMES a day! Prices move up and down often — completely normal, even for great companies.',
+    err:'Prices can change MANY TIMES a day — like a gentle roller coaster, even for successful companies!' },
+  { cat:'🧠 Being Smart', type:'pick4', e:'⚠️', col:'#90e0ef',
+    q:'Can a company\'s share price ever go DOWN and stay down for a while?',
+    sub:'It\'s important to know this!',
+    hint:'Nothing is guaranteed…',
+    opts:['No, shares always go up eventually','Yes — shares can lose value, nothing is guaranteed','Only on weekends','Only for very small companies'], c:1,
+    ok:'⚠️ YES — shares can lose value, and nothing is ever guaranteed to always go up!',
+    err:'YES, shares can go DOWN and stay down — nothing about investing is ever guaranteed!' },
+  { cat:'🧠 Being Smart', type:'pick4', e:'🐢', col:'#90e0ef',
+    q:'How do smart, wise investors usually think about buying shares?',
+    sub:'Think about the tree-planting comparison',
+    hint:'Not rushing…',
+    opts:['They panic if the price drops for a day','They think patiently, over years, not days','They guess randomly','They only buy on Mondays'], c:1,
+    ok:'🐢 They think PATIENTLY, over years — like planting a tree and waiting for it to grow tall!',
+    err:'Wise investors think PATIENTLY over years, not days — just like waiting for a tree to grow!' },
+  { cat:'🧠 Grand Finale!', type:'pick4', e:'🚫', col:'#90e0ef',
+    q:'Is buying shares the same thing as playing a lottery or gambling?',
+    sub:'Think about what wise investors actually do',
+    hint:'Research vs. pure luck…',
+    opts:['Yes, it\'s exactly the same as gambling','No — wise investors research and think carefully, unlike pure luck games','Yes, but only on weekends','No, because shares never change price'], c:1,
+    ok:'🚫 NO! Wise investors research companies and think carefully — it\'s about patience and knowledge, not pure luck. You\'re a true stocks expert now, David! 📈🍋',
+    err:'NO — investing involves research and careful thinking, unlike a pure luck game such as a lottery!' },
+];
+
+let chIdx=0, seenChs=new Set([0]);
+let qIdx=0, score=0, streak=0, bestStreak=0, correctCount=0, answered=false, hintShown=false;
+
+const APP_ID='stocks', APP_LABEL='Stocks & Companies';
+function recordSession(score,maxScore,extra){
+  try{
+    const key='david-stats-v1';
+    const rec={app:APP_ID,appLabel:APP_LABEL,date:new Date().toISOString(),score,maxScore,pct:maxScore?score/maxScore:0,extra:extra||{}};
+    const existing=JSON.parse(localStorage.getItem(key)||'[]');
+    existing.push(rec);
+    if(existing.length>300) existing.splice(0,existing.length-300);
+    localStorage.setItem(key,JSON.stringify(existing));
+  }catch(e){}
+}
+
+function normalizeAns(s){
+  return String(s).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s.]/g,'')
+    .replace(/\b(the|a|an|river|mount|mt|lake|ocean|sea)\b/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function fuzzyMatch(val,accept){
+  const nv=normalizeAns(val);
+  return accept.some(a=>{
+    const na=normalizeAns(a);
+    if(nv===na) return true;
+    const numeric = /^[0-9.,]+$/.test(na) || /^[0-9.,]+$/.test(nv);
+    if(numeric) return false;
+    return (nv.length>2 && na.includes(nv)) || (na.length>2 && nv.includes(na));
+  });
+}
+
+const flEl=document.getElementById('floaters');
+const fIcons=['🍋','💰','📈','📉','🏢','🍕','🏛️','💻','🎁','🌱','🐢','🤝','📱','👟','🍔','🏰'];
+for(let i=0;i<18;i++){const s=document.createElement('span');s.textContent=fIcons[Math.floor(Math.random()*fIcons.length)];s.style.left=(Math.random()*100)+'%';s.style.fontSize=(.9+Math.random()*1.3)+'rem';s.style.animationDuration=(9+Math.random()*13)+'s';s.style.animationDelay=(Math.random()*10)+'s';flEl.appendChild(s);}
+
+function buildDots(){
+  const dc=document.getElementById('chDots'); dc.innerHTML='';
+  chapters.forEach((ch,i)=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(i===chIdx?' active':seenChs.has(i)?' done':'');
+    d.textContent=ch.emoji;
+    d.onclick=()=>{chIdx=i;seenChs.add(i);buildDots();renderCh();};
+    dc.appendChild(d);
+  });
+}
+
+function renderCh(){
+  const ch=chapters[chIdx];
+  const isLast=chIdx===chapters.length-1;
+  const area=document.getElementById('chArea');
+  area.innerHTML=`<div class="ch-card" id="chCard">
+    <div class="ch-num">Chapter ${chIdx+1} of ${chapters.length}</div>
+    <div class="ch-title">${ch.emoji} ${ch.title}</div>
+    ${ch.content}
+    <div class="ch-nav">
+      ${chIdx>0?`<button class="ch-btn ch-prev" onclick="moveCh(-1)">⬅️ Back</button>`:''}
+      ${!isLast
+        ?`<button class="ch-btn ch-next" onclick="moveCh(1)">Next Chapter ➡️</button>`
+        :`<button class="ch-btn ch-quiz" onclick="goQuiz()">⚡ Ready — Quiz me!</button>`}
+    </div>
+  </div>`;
+  const card=document.getElementById('chCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function moveCh(dir){
+  chIdx=Math.max(0,Math.min(chapters.length-1,chIdx+dir));
+  seenChs.add(chIdx); buildDots(); renderCh();
+}
+
+function goLearn(){
+  document.getElementById('learnPhase').style.display='block';
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.add('active');
+  document.getElementById('tabQuiz').classList.remove('active');
+}
+
+function goQuiz(){
+  document.getElementById('learnPhase').style.display='none';
+  document.getElementById('quizPhase').style.display='block';
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('tabLearn').classList.remove('active');
+  document.getElementById('tabQuiz').classList.add('active');
+  qIdx=0; score=0; streak=0; bestStreak=0; correctCount=0; answered=false; hintShown=false;
+  document.getElementById('qhScore').textContent='0';
+  document.getElementById('qhStreak').textContent='0🔥';
+  renderQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQ(){
+  answered=false; hintShown=false;
+  const q=questions[qIdx];
+  document.getElementById('qhNum').textContent=`${qIdx+1}/${questions.length}`;
+  document.getElementById('progFill').style.width=((qIdx/questions.length)*100)+'%';
+  document.getElementById('qTypePill').textContent=q.type==='type'?'⌨️ TYPE IT':'🖱️ CHOOSE';
+  document.getElementById('qEmoji').textContent=q.e;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qSub').textContent=q.sub||'';
+
+  const tag=document.getElementById('qTag');
+  tag.textContent=q.cat; tag.style.color=q.col; tag.style.borderColor=q.col+'55'; tag.style.background=q.col+'12';
+
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  const hb=document.getElementById('hintBox'); hb.className='hint-box'; hb.textContent='💡 Tap for a hint';
+
+  const aa=document.getElementById('answerArea'); aa.innerHTML='';
+  if(q.type==='type'){
+    aa.innerHTML=`<div class="type-wrap">
+      <input class="type-input" id="typeIn" placeholder="Type your answer…" autocomplete="off" spellcheck="false"/>
+      <button class="submit-btn" id="subBtn" onclick="submitType()">✅ Check Answer</button>
+    </div>`;
+    const inp=document.getElementById('typeIn');
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitType();});
+    setTimeout(()=>inp.focus(),100);
+  } else {
+    const grid=document.createElement('div');
+    grid.className=q.opts.length>4?'opts-6':'opts-4';
+    q.opts.forEach((opt,i)=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt;
+      btn.onclick=()=>pickOpt(i,btn); grid.appendChild(btn);
+    });
+    aa.appendChild(grid);
+  }
+  const card=document.getElementById('qCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='cardIn .45s cubic-bezier(.34,1.56,.64,1) both';
+}
+
+function showHint(){
+  if(hintShown||answered)return;
+  hintShown=true;
+  const hb=document.getElementById('hintBox');
+  hb.className='hint-box shown'; hb.textContent='💡 Hint: '+questions[qIdx].hint;
+}
+
+function submitType(){
+  if(answered)return;
+  const inp=document.getElementById('typeIn'), val=inp.value.trim();
+  if(!val){inp.focus();return;}
+  const q=questions[qIdx];
+  const correct=fuzzyMatch(val,q.accept);
+  inp.disabled=true; document.getElementById('subBtn').disabled=true;
+  inp.className='type-input '+(correct?'ok-in':'err-in');
+  processAns(correct,q);
+}
+
+function pickOpt(chosen,btn){
+  if(answered)return;
+  const q=questions[qIdx];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const correct=chosen===q.c;
+  if(correct) btn.classList.add('correct');
+  else { btn.classList.add('wrong'); document.querySelectorAll('.opt')[q.c].classList.add('correct'); }
+  processAns(correct,q);
+}
+
+function processAns(correct,q){
+  answered=true;
+  const fb=document.getElementById('fb'); fb.style.display='block';
+  if(correct){
+    const pts=10+(streak>=2?5:0)+(!hintShown?3:0);
+    score+=pts; streak++; if(streak>bestStreak)bestStreak=streak; correctCount++;
+    document.getElementById('qhScore').textContent=score;
+    document.getElementById('qhStreak').textContent=streak+'🔥';
+    fb.className='fb ok';
+    fb.textContent=q.ok+(streak>=3?` 🔥 ${streak} in a row!`:'')+(!hintShown?' ⭐ No-hint bonus!':'');
+  } else {
+    streak=0; document.getElementById('qhStreak').textContent='0🔥';
+    fb.className='fb err'; fb.textContent=q.err;
+  }
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=questions.length) showResults();
+  else renderQ();
+}
+
+function showResults(){
+  document.getElementById('quizPhase').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('progFill').style.width='100%';
+
+  const rawPct = correctCount / questions.length;
+  recordSession(correctCount, questions.length, {rawScore:score});
+
+  let trophy,title,sub;
+  if(rawPct>=1)      {trophy='🏆';title='PERFECT, David!';sub=`${score} points! You understand companies and stocks brilliantly! 📈👑`;}
+  else if(rawPct>=.8){trophy='🥇';title='Investor Expert, David!';sub=`${score} points! Outstanding understanding of companies and shares! 🔥`;}
+  else if(rawPct>=.6){trophy='🥈';title='Brilliant work, David!';sub=`${score} points! Really solid understanding! Go over the chapters and try again! 💪`;}
+  else if(rawPct>=.4){trophy='🍋';title='Good effort, David!';sub=`${score} points! Re-read the lemonade stand story and try again — you'll get it! 🚀`;}
+  else               {trophy='🌱';title='Keep going, David!';sub=`${score} points! Read every chapter carefully first, then try the quiz. You can do it! 💪`;}
+
+  document.getElementById('rTrophy').textContent=trophy;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rSub').textContent=sub;
+  document.getElementById('rStars').textContent=rawPct>=1?'⭐⭐⭐⭐⭐':rawPct>=.8?'⭐⭐⭐⭐':rawPct>=.6?'⭐⭐⭐':rawPct>=.4?'⭐⭐':'⭐';
+
+  const fl2=document.getElementById('flList'); fl2.innerHTML='';
+  chapters.forEach(ch=>{
+    ch.facts.forEach(f=>{
+      const d=document.createElement('div'); d.className='fl-row';
+      d.innerHTML=`<span style="font-size:.9rem;flex-shrink:0">📈</span><span>${f}</span>`; fl2.appendChild(d);
+    });
+  });
+
+  const ml=document.getElementById('rMl');
+  if(rawPct>=.7){
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Incredible, David! Companies, shares, the stock market — you understand it all! 📈👑</p>
+      <p class="ro">🇷🇴 Incredibil, David! Companii, acțiuni, bursa — înțelegi totul perfect! 🌟</p>
+      <p class="es">🇪🇸 ¡Increíble, David! ¡Empresas, acciones, la bolsa — lo entiendes todo perfectamente! 🏆</p>`;
+  } else {
+    ml.innerHTML=`
+      <p class="en">🇬🇧 Good effort, David! Read the chapters again carefully then retake the quiz — you'll do much better! 💪</p>
+      <p class="ro">🇷🇴 Efort bun, David! Recitește capitolele cu atenție și încearcă din nou — vei reuși! 📚</p>
+      <p class="es">🇪🇸 ¡Buen esfuerzo, David! ¡Vuelve a leer los capítulos e inténtalo de nuevo! 🔄</p>`;
+  }
+  if(rawPct>=.6) launchConfetti();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function launchConfetti(){
+  const cols=['#ffc107','#7bed9f','#ff6b35','#f72585','#90e0ef','#c77dff','#e8d5b0'];
+  for(let i=0;i<90;i++){setTimeout(()=>{const c=document.createElement('div');c.className='cp';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(1.5+Math.random()*2.5)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);},i*20);}
+}
+
+buildDots(); renderCh();
+</script>
+</body>
+</html>
